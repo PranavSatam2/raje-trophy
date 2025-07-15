@@ -13,7 +13,7 @@ public class Trophy {
     private Long id;
 
     @NotBlank(message = "Trophy code is required")
-    @Column(unique = true)
+    @Column() // allow multiple entries with same trophy code but different size
     private String trophyCode;
 
     @NotNull(message = "Size is required")
@@ -41,6 +41,13 @@ public class Trophy {
     @Column(name = "inspection_report", length = 500)
     private String image;
 
+    @PositiveOrZero(message = "Sold price cannot be negative")
+    private Double soldPrice;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "sold_date")
+    private Date soldDate;
+
     // ---------------------------
     // ✅ Constructors
     // ---------------------------
@@ -49,7 +56,7 @@ public class Trophy {
     }
 
     public Trophy(Long id, String trophyCode, Double size, Double price, Integer quantity, String colour,
-                  String location, Date doe, String image) {
+                  String location, Date doe, String image, Double soldPrice, Date soldDate) {
         this.id = id;
         this.trophyCode = trophyCode;
         this.size = size;
@@ -59,6 +66,8 @@ public class Trophy {
         this.location = location;
         this.doe = doe;
         this.image = image;
+        this.soldPrice = soldPrice;
+        this.soldDate = soldDate;
     }
 
     // ---------------------------
@@ -137,6 +146,22 @@ public class Trophy {
         this.image = image;
     }
 
+    public Double getSoldPrice() {
+        return soldPrice;
+    }
+
+    public void setSoldPrice(Double soldPrice) {
+        this.soldPrice = soldPrice;
+    }
+
+    public Date getSoldDate() {
+        return soldDate;
+    }
+
+    public void setSoldDate(Date soldDate) {
+        this.soldDate = soldDate;
+    }
+
     // ---------------------------
     // ✅ Builder Pattern
     // ---------------------------
@@ -155,6 +180,8 @@ public class Trophy {
         private String location;
         private Date doe;
         private String image;
+        private Double soldPrice;
+        private Date soldDate;
 
         public TrophyBuilder id(Long id) {
             this.id = id;
@@ -201,8 +228,18 @@ public class Trophy {
             return this;
         }
 
+        public TrophyBuilder soldPrice(Double soldPrice) {
+            this.soldPrice = soldPrice;
+            return this;
+        }
+
+        public TrophyBuilder soldDate(Date soldDate) {
+            this.soldDate = soldDate;
+            return this;
+        }
+
         public Trophy build() {
-            return new Trophy(id, trophyCode, size, price, quantity, colour, location, doe, image);
+            return new Trophy(id, trophyCode, size, price, quantity, colour, location, doe, image, soldPrice, soldDate);
         }
     }
 }
