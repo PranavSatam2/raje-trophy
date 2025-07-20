@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/damaged-trophies")
+@CrossOrigin(origins = "http://localhost:3000")
 public class DamagedTrophyController {
 
     public DamagedTrophyController() {
