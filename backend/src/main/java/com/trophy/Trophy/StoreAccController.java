@@ -4,6 +4,7 @@ import java.util.List;
 
 // import com.trophy.Trophy.DamagedTrophy.TrophyUpdateDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/rajetrophy")
-@CrossOrigin(origins = "http://localhost:3001") // for React frontend
+@CrossOrigin(origins = "http://localhost:3000") // for React frontend
 public class StoreAccController {
 
     public StoreAccController() {
@@ -21,11 +22,6 @@ public class StoreAccController {
     @Autowired
     private StoreAccService service;
 
-    // ✅ 1. Get all trophies
-    @GetMapping
-    public List<Trophy> getAllTrophies() {
-        return service.getAllTrophies();
-    }
 
     // ✅ 3. Save multiple trophies from DTO (Main Requirement)
     @PostMapping("/add")
@@ -40,24 +36,40 @@ public class StoreAccController {
 //        return service.saveStoreAcceptance(trophy);
 //    }
 
-    // ✅ Get all trophies by trophyCode
-    @GetMapping("/code/{trophyCode}")
-    public ResponseEntity<List<Trophy>> getTrophiesByTrophyCode(@PathVariable String trophyCode) {
-        List<Trophy> trophies = service.getTrophiesByTrophyCode(trophyCode);
-        return ResponseEntity.ok(trophies);
+    // Get specific trophy by code and size
+    @GetMapping("/find/{trophyCode}/size/{size}")
+    public ResponseEntity<Trophy> findByTrophyCodeAndSize(
+            @PathVariable String trophyCode,
+            @PathVariable Double size) {
+
+        try {
+            Trophy trophy = service.findByTrophyCodeAndSize(trophyCode, size);
+            return ResponseEntity.ok(trophy);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    // ✅ Update all trophies by trophyCode
+    // Update trophy by code and size
     @PutMapping("/update/{trophyCode}/size/{size}")
-    public ResponseEntity<Trophy> updateByTrophyCodeAndSize(
+    public ResponseEntity<String> updateByTrophyCodeAndSize(
             @PathVariable String trophyCode,
             @PathVariable Double size,
-            @RequestBody TrophyUpdateDTO dto) {
+            @RequestBody Trophy updatedTrophy) {
 
-        // Assuming only 1 size record is passed for this case
-        TrophyUpdateDTO.SizeDetail sizeDetail = dto.getSizes().get(0);
-        Trophy updated = service.updateByTrophyCodeAndSize(trophyCode, size, sizeDetail, dto);
-        return ResponseEntity.ok(updated);
+        try {
+            service.updateByTrophyCodeAndSize(trophyCode, size, updatedTrophy);
+            return ResponseEntity.ok("Successfully updated trophy with code: " + trophyCode + " and size: " + size);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+        }
+    }
+
+    // Get all trophies
+    @GetMapping("/all")
+    public ResponseEntity<List<Trophy>> getAllTrophies() {
+        List<Trophy> trophies = service.getAllTrophies();
+        return ResponseEntity.ok(trophies);
     }
 
 

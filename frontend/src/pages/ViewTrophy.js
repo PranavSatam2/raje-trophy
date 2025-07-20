@@ -32,6 +32,8 @@ function ViewTrophy() {
             <th>Colour</th>
             <th>Location</th>
             <th>Date</th>
+            <th>Sold Date</th>
+            <th>Sold Price</th>
             <th>Image</th>
             <th>Action</th>
           </tr>
@@ -46,6 +48,8 @@ function ViewTrophy() {
               <td>{trophy.colour}</td>
               <td>{trophy.location}</td>
               <td>{trophy.doe?.split("T")[0]}</td>
+              <td>{trophy.soldDate?.split("T")[0]}</td>
+              <td>₹{trophy.soldPrice}</td>
               <td>
                 {trophy.image ? (
                   <img src={trophy.image} alt="trophy" width="50" />
@@ -54,12 +58,9 @@ function ViewTrophy() {
                 )}
               </td>
               <td>
-                <Link
-                  to={`/admin/dashboard/edit-trophy/${trophy.id}`}
-                  className="btn btn-sm btn-warning me-2"
-                >
-                  Edit
-                </Link>
+                <button className="btn btn-warning me-2 mb-1">
+                  <Link to={`/admin/dashboard/edit/${trophy.trophyCode}/${trophy.size}`}>Edit</Link>
+                </button>
               </td>
             </tr>
           ))}

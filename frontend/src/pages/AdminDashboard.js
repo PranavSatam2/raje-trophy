@@ -1,9 +1,5 @@
 import React from "react";
-import { Link, Routes, Route } from "react-router-dom";
-import AddTrophy from "./AddTrophy";
-import ViewTrophy from "./ViewTrophy";
-import EditTrophy from "./EditTrophy";
-import DeleteTrophy from "./DeleteTrophy";
+import { Link, Outlet } from "react-router-dom";
 
 function AdminDashboard() {
   return (
@@ -18,23 +14,13 @@ function AdminDashboard() {
           <li className="nav-item">
             <Link to="view-trophy" className="nav-link text-white">View Trophy</Link>
           </li>
-          <li className="nav-item">
-            <Link to="edit-trophy" className="nav-link text-white">Edit Trophy</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="delete-trophy" className="nav-link text-white">Delete Trophy</Link>
-          </li>
         </ul>
       </div>
 
       {/* Main Content */}
       <div className="flex-grow-1 p-4">
-        <Routes>
-          <Route path="add-trophy" element={<AddTrophy />} />
-          <Route path="view-trophy" element={<ViewTrophy />} />
-          <Route path="edit-trophy" element={<EditTrophy />} />
-          <Route path="delete-trophy" element={<DeleteTrophy />} />
-        </Routes>
+        {/* This is where nested route content like EditTrophy will render */}
+        <Outlet />
       </div>
     </div>
   );

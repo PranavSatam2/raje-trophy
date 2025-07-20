@@ -1,5 +1,6 @@
 package com.trophy.Trophy;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,27 +22,31 @@ public class StoreAccService {
 
     // ✅ Add multiple trophies for one trophyCode
     public String saveMultipleTrophies(TrophyDTO dto) {
-        logger.info("Saving multiple trophies for trophyCode: {}", dto.getTrophyCode());
+        List<TrophyDTO.SizeDetail> sizes = dto.getSizes(); // ✅ should work
 
-        List<Trophy> trophies = dto.getSizes().stream().map(sizeDetail -> Trophy.builder()
-                .trophyCode(dto.getTrophyCode())
-                .location(dto.getLocation())
-                .doe(dto.getDoe())
-                .image(dto.getImage())
-                .size(sizeDetail.getSize())
-                .price(sizeDetail.getPrice())
-                .quantity(sizeDetail.getQuantity())
-                .colour(sizeDetail.getColour())
-                .soldPrice(sizeDetail.getSoldPrice())
-                .soldDate(sizeDetail.getSoldDate())
-                .build()
-        ).collect(Collectors.toList());
+        for (TrophyDTO.SizeDetail sizeDetail : sizes) {
+            Trophy trophy = new Trophy();
 
-        repository.saveAll(trophies);
-        logger.debug("Total {} trophies saved for trophyCode: {}", trophies.size(), dto.getTrophyCode());
+            trophy.setTrophyCode(dto.getTrophyCode());
+            trophy.setSize(sizeDetail.getSize());
+            trophy.setPrice(sizeDetail.getPrice());
+            trophy.setQuantity(sizeDetail.getQuantity());
+            trophy.setColour(sizeDetail.getColour());
+            trophy.setLocation(sizeDetail.getLocation());
+            trophy.setDoe(Date.valueOf(sizeDetail.getDoe())); // only if doe is string in "yyyy-MM-dd"
+            trophy.setImage(sizeDetail.getImage());
+            trophy.setSoldDate(Date.valueOf(sizeDetail.getSoldDate()));
+            trophy.setSoldPrice(sizeDetail.getSoldPrice());
+            trophy.setSoldDate(Date.valueOf(sizeDetail.getSoldDate()));
+            trophy.setSoldPrice(sizeDetail.getSoldPrice());
 
-        return "✅ Trophies saved successfully";
+            repository.save(trophy);
+        }
+
+        return "Trophies added successfully!";
     }
+
+
 
     // ✅ Get all
     public List<Trophy> getAllTrophies() {
@@ -49,27 +54,29 @@ public class StoreAccService {
         return repository.findAll();
     }
 
-    // ✅ Get trophies by trophyCode
-    public List<Trophy> getTrophiesByTrophyCode(String trophyCode) {
-        logger.info("Fetching trophies with code: {}", trophyCode);
-        return repository.findByTrophyCode(trophyCode);
+    // Find specific trophy by code and size
+    public Trophy findByTrophyCodeAndSize(String trophyCode, Double size) {
+        return repository.findByTrophyCodeAndSize(trophyCode, size)
+                .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size));
     }
+
+    // Update trophy by code and size
     @Transactional
-    public Trophy updateByTrophyCodeAndSize(String trophyCode, Double size, TrophyUpdateDTO.SizeDetail updateData, TrophyUpdateDTO generalData) {
-        Trophy trophy = repository.findByTrophyCodeAndSize(trophyCode, size)
+    public void updateByTrophyCodeAndSize(String trophyCode, Double size, Trophy updatedData) {
+        Trophy existingTrophy = repository.findByTrophyCodeAndSize(trophyCode, size)
                 .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size));
 
-        if (updateData.getPrice() != null) trophy.setPrice(updateData.getPrice());
-        if (updateData.getQuantity() != null) trophy.setQuantity(updateData.getQuantity());
-        if (updateData.getColour() != null) trophy.setColour(updateData.getColour());
-        if (updateData.getSoldPrice() != null) trophy.setSoldPrice(updateData.getSoldPrice());
-        if (updateData.getSoldDate() != null) trophy.setSoldDate(updateData.getSoldDate());
+        // Update fields (keeping trophyCode and size unchanged)
+        existingTrophy.setPrice(updatedData.getPrice());
+        existingTrophy.setQuantity(updatedData.getQuantity());
+        existingTrophy.setColour(updatedData.getColour());
+        existingTrophy.setLocation(updatedData.getLocation());
+        existingTrophy.setDoe(updatedData.getDoe());
+        existingTrophy.setImage(updatedData.getImage());
+        existingTrophy.setSoldDate(updatedData.getSoldDate());
+        existingTrophy.setSoldPrice(updatedData.getSoldPrice());
 
-        if (generalData.getLocation() != null) trophy.setLocation(generalData.getLocation());
-        if (generalData.getDoe() != null) trophy.setDoe(generalData.getDoe());
-        if (generalData.getImage() != null) trophy.setImage(generalData.getImage());
-
-        return repository.save(trophy);
+        repository.save(existingTrophy);
     }
 
 

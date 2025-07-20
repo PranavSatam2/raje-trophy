@@ -1,166 +1,225 @@
-// src/pages/EditTrophy.js
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TrophyService from "../services/TrophyService";
 
-function EditTrophy() {
-  const { id } = useParams();
+const EditTrophy = () => {
+  const { trophyCode, size } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    trophyCode: "",
-    size: "",
+    colour: "",
+    doe: "",
+    image: "",
+    location: "",
     price: "",
     quantity: "",
-    colour: "",
-    location: "",
-    doe: "",
-    image: ""
+    trophyCode: trophyCode || "",
+    size: size || "",
+    soldDate: "",
+    soldPrice: ""
   });
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Helper function to format date for input
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "";
+    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+  };
+
+  // Helper function to safely get string values
+  const safeStringValue = (value) => {
+    return value != null ? String(value) : "";
+  };
+
   useEffect(() => {
-    TrophyService.getTrophyById(id).then((res) => {
-      const data = res.data;
-      data.doe = data.doe?.split("T")[0]; // format date
-      setFormData(data);
-    });
-  }, [id]);
+    console.log("Fetching trophy data for:", trophyCode, size);
+    
+    TrophyService.getTrophyByCode(trophyCode, size)
+      .then((res) => {
+        console.log("API Response:", res.data);
+        
+        let matchingTrophy = null;
+        
+        // Handle different response structures
+        if (Array.isArray(res.data)) {
+          // If res.data is an array, find the matching trophy
+          matchingTrophy = res.data.find(
+            (trophy) => parseFloat(trophy.size) === parseFloat(size)
+          );
+        } else if (res.data && typeof res.data === 'object') {
+          // If res.data is a single object, use it directly
+          matchingTrophy = res.data;
+        }
+        
+        if (matchingTrophy) {
+          console.log("Matching trophy found:", matchingTrophy);
+          
+          // Populate form data with proper formatting
+          setFormData({
+            colour: safeStringValue(matchingTrophy.colour),
+            doe: formatDateForInput(matchingTrophy.doe),
+            image: safeStringValue(matchingTrophy.image),
+            location: safeStringValue(matchingTrophy.location),
+            price: safeStringValue(matchingTrophy.price),
+            quantity: safeStringValue(matchingTrophy.quantity),
+            trophyCode: safeStringValue(matchingTrophy.trophyCode || trophyCode),
+            size: safeStringValue(matchingTrophy.size || size),
+            soldDate: formatDateForInput(matchingTrophy.soldDate),
+            soldPrice: safeStringValue(matchingTrophy.soldPrice)
+          });
+        } else {
+          console.error("No matching trophy found for size:", size);
+          setError("Trophy not found for the specified size");
+        }
+        
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setError("Failed to load trophy data");
+        setLoading(false);
+      });
+  }, [trophyCode, size]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const parsedValue =
-      name === "size" || name === "price" || name === "quantity"
-        ? parseFloat(value)
-        : value;
-
-    setFormData((prev) => ({ ...prev, [name]: parsedValue }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await TrophyService.updateTrophy(id, formData);
-      alert("✅ Trophy updated successfully!");
-      navigate("/admin/dashboard/view-trophy");
-    } catch (err) {
-      console.error("Error updating trophy:", err);
-      alert("❌ Failed to update trophy.");
-    }
+    
+    // Create payload with proper data types
+    const payload = {
+      sizes: [{
+        ...formData,
+        price: formData.price ? parseFloat(formData.price) : null,
+        quantity: formData.quantity ? parseInt(formData.quantity) : null,
+        soldPrice: formData.soldPrice ? parseFloat(formData.soldPrice) : null,
+      }],
+    };
+    
+    console.log("Submitting payload:", payload);
+    
+    TrophyService.updateTrophyByCodeAndSize(trophyCode, size, payload)
+      .then(() => {
+        console.log("Update successful");
+        navigate("/trophies");
+      })
+      .catch((err) => {
+        console.error("Update failed:", err);
+        setError("Failed to update trophy");
+      });
   };
+
+  if (loading) return <div className="container mt-4"><p>Loading...</p></div>;
+  
+  if (error) return <div className="container mt-4"><p className="text-danger">Error: {error}</p></div>;
 
   return (
-    <div className="container mt-4">
-      <h3 className="text-primary mb-3">Edit Trophy</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Trophy Code</label>
-          <input
-            type="text"
-            name="trophyCode"
-            value={formData.trophyCode}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="container mt-4">
+      <h2 className="mb-4">Edit Trophy - {trophyCode} / {size}</h2>
 
-        <div className="mb-3">
-          <label className="form-label">Size (in inches)</label>
-          <select
-            name="size"
-            value={formData.size}
-            onChange={handleChange}
-            className="form-select"
-            required
-          >
-            <option value="">-- Select Size --</option>
-            {[4, 6, 8, 10, 12].map((size) => (
-              <option key={size} value={size}>{size}"</option>
-            ))}
-          </select>
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Colour</label>
+        <input 
+          name="colour" 
+          className="form-control" 
+          value={formData.colour} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Price (₹)</label>
-          <input
-            type="number"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            className="form-control"
-            step="0.01"
-            required
-          />
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Date of Entry (DOE)</label>
+        <input 
+          type="date" 
+          name="doe" 
+          className="form-control" 
+          value={formData.doe} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={formData.quantity}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Image</label>
+        <input 
+          name="image" 
+          className="form-control" 
+          value={formData.image} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Colour</label>
-          <input
-            type="text"
-            name="colour"
-            value={formData.colour}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Location</label>
+        <input 
+          name="location" 
+          className="form-control" 
+          value={formData.location} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Location</label>
-          <select
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className="form-select"
-            required
-          >
-            <option value="">-- Select Location --</option>
-            <option value="Navi-Mumbai">Navi-Mumbai</option>
-            <option value="Alibaugh">Alibaugh</option>
-            <option value="Shri-Vardhan">Shri-Vardhan</option>
-          </select>
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Price</label>
+        <input 
+          type="number" 
+          step="0.01" 
+          name="price" 
+          className="form-control" 
+          value={formData.price} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Date of Entry</label>
-          <input
-            type="date"
-            name="doe"
-            value={formData.doe}
-            onChange={handleChange}
-            className="form-control"
-            required
-          />
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Quantity</label>
+        <input 
+          type="number" 
+          name="quantity" 
+          className="form-control" 
+          value={formData.quantity} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <div className="mb-3">
-          <label className="form-label">Image URL</label>
-          <input
-            type="text"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
+      <div className="mb-3">
+        <label className="form-label">Sold Date</label>
+        <input 
+          type="date" 
+          name="soldDate" 
+          className="form-control" 
+          value={formData.soldDate} 
+          onChange={handleChange} 
+        />
+      </div>
 
-        <button type="submit" className="btn btn-primary">
-          Update Trophy
-        </button>
-      </form>
-    </div>
+      <div className="mb-3">
+        <label className="form-label">Sold Price</label>
+        <input 
+          type="number" 
+          step="0.01" 
+          name="soldPrice" 
+          className="form-control" 
+          value={formData.soldPrice} 
+          onChange={handleChange} 
+        />
+      </div>
+
+      <button type="submit" className="btn btn-primary">Update</button>
+      <button 
+        type="button" 
+        className="btn btn-secondary ms-2" 
+        onClick={() => navigate("/trophies")}
+      >
+        Cancel
+      </button>
+    </form>
   );
-}
+};
 
 export default EditTrophy;

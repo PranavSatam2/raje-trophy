@@ -28,7 +28,7 @@ function App() {
           <Route index element={<Navigate to="add-trophy" />} />
           <Route path="add-trophy" element={<AddTrophy />} />
           <Route path="view-trophy" element={<ViewTrophy />} />
-          <Route path="edit-trophy/:id" element={<EditTrophy />} />
+          <Route path="edit/:trophyCode/:size" element={<EditTrophy />} />
           <Route path="delete-trophy" element={<DeleteTrophy />} />
         </Route>
       </Routes>
