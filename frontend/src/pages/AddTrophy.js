@@ -200,29 +200,6 @@ function AddTrophy() {
                   className="form-control"
                 />
               </div>
-
-              <div className="form-group">
-                <label>Sold Date</label>
-                <input
-                  type="date"
-                  name="soldDate"
-                  className="form-control"
-                  value={entry.soldDate}
-                  onChange={(e) => handleSizeChange(index, e)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Sold Price</label>
-                <input
-                  type="number"
-                  name="soldPrice"
-                  className="form-control"
-                  value={entry.soldPrice}
-                  onChange={(e) => handleSizeChange(index, e)}
-                />
-              </div>
-
             </div>
 
             {formData.sizes.length > 1 && (

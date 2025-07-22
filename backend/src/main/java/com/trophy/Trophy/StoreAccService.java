@@ -33,12 +33,11 @@ public class StoreAccService {
             trophy.setQuantity(sizeDetail.getQuantity());
             trophy.setColour(sizeDetail.getColour());
             trophy.setLocation(sizeDetail.getLocation());
-            trophy.setDoe(Date.valueOf(sizeDetail.getDoe())); // only if doe is string in "yyyy-MM-dd"
+            // Parse DOE safely
+            if (sizeDetail.getDoe() != null && !sizeDetail.getDoe().isEmpty()) {
+                trophy.setDoe(Date.valueOf(sizeDetail.getDoe())); // only if doe is string in "yyyy-MM-dd"
+            }
             trophy.setImage(sizeDetail.getImage());
-            trophy.setSoldDate(Date.valueOf(sizeDetail.getSoldDate()));
-            trophy.setSoldPrice(sizeDetail.getSoldPrice());
-            trophy.setSoldDate(Date.valueOf(sizeDetail.getSoldDate()));
-            trophy.setSoldPrice(sizeDetail.getSoldPrice());
 
             repository.save(trophy);
         }
