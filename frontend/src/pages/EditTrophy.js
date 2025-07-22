@@ -36,13 +36,13 @@ const EditTrophy = () => {
 
   useEffect(() => {
     console.log("Fetching trophy data for:", trophyCode, size);
-    
+
     TrophyService.getTrophyByCode(trophyCode, size)
       .then((res) => {
         console.log("API Response:", res.data);
-        
+
         let matchingTrophy = null;
-        
+
         // Handle different response structures
         if (Array.isArray(res.data)) {
           // If res.data is an array, find the matching trophy
@@ -53,10 +53,10 @@ const EditTrophy = () => {
           // If res.data is a single object, use it directly
           matchingTrophy = res.data;
         }
-        
+
         if (matchingTrophy) {
           console.log("Matching trophy found:", matchingTrophy);
-          
+
           // Populate form data with proper formatting
           setFormData({
             colour: safeStringValue(matchingTrophy.colour),
@@ -74,7 +74,7 @@ const EditTrophy = () => {
           console.error("No matching trophy found for size:", size);
           setError("Trophy not found for the specified size");
         }
-        
+
         setLoading(false);
       })
       .catch((err) => {
@@ -91,7 +91,7 @@ const EditTrophy = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Create payload with proper data types
     const payload = {
       sizes: [{
@@ -101,9 +101,9 @@ const EditTrophy = () => {
         soldPrice: formData.soldPrice ? parseFloat(formData.soldPrice) : null,
       }],
     };
-    
+
     console.log("Submitting payload:", payload);
-    
+
     TrophyService.updateTrophyByCodeAndSize(trophyCode, size, payload)
       .then(() => {
         console.log("Update successful");
@@ -116,108 +116,128 @@ const EditTrophy = () => {
   };
 
   if (loading) return <div className="container mt-4"><p>Loading...</p></div>;
-  
+
   if (error) return <div className="container mt-4"><p className="text-danger">Error: {error}</p></div>;
 
   return (
     <form onSubmit={handleSubmit} className="container mt-4">
       <h2 className="mb-4">Edit Trophy - {trophyCode} / {size}</h2>
 
-      <div className="mb-3">
-        <label className="form-label">Colour</label>
-        <input 
-          name="colour" 
-          className="form-control" 
-          value={formData.colour} 
-          onChange={handleChange} 
-        />
-      </div>
+      {/* Since formData is not an array, remove the .map and use the fields directly */}
+      <div className="card mb-3 p-3 shadow-sm">
+        <h5 className="text-secondary">Trophy Details</h5>
+        <div className="row">
+          <div className="col-md-2 mb-2">
+            <label>Size (inches)</label>
+            <input
+              type="number"
+              name="size"
+              value={formData.size}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Date of Entry (DOE)</label>
-        <input 
-          type="date" 
-          name="doe" 
-          className="form-control" 
-          value={formData.doe} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-2 mb-2">
+            <label>Price (₹)</label>
+            <input
+              type="number"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              className="form-control"
+              step="0.01"
+              required
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Image</label>
-        <input 
-          name="image" 
-          className="form-control" 
-          value={formData.image} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-2 mb-2">
+            <label>Quantity</label>
+            <input
+              type="number"
+              name="quantity"
+              value={formData.quantity}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Location</label>
-        <input 
-          name="location" 
-          className="form-control" 
-          value={formData.location} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-2 mb-2">
+            <label>Colour</label>
+            <input
+              type="text"
+              name="colour"
+              value={formData.colour}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Price</label>
-        <input 
-          type="number" 
-          step="0.01" 
-          name="price" 
-          className="form-control" 
-          value={formData.price} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-2 mb-2">
+            <label>Location</label>
+            <select
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="">Select</option>
+              <option value="Navi-Mumbai">Navi-Mumbai</option>
+              <option value="Alibaugh">Alibaugh</option>
+              <option value="Shri-Vardhan">Shri-Vardhan</option>
+            </select>
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Quantity</label>
-        <input 
-          type="number" 
-          name="quantity" 
-          className="form-control" 
-          value={formData.quantity} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-2 mb-2">
+            <label>Date of Entry</label>
+            <input
+              type="date"
+              name="doe"
+              value={formData.doe}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Sold Date</label>
-        <input 
-          type="date" 
-          name="soldDate" 
-          className="form-control" 
-          value={formData.soldDate} 
-          onChange={handleChange} 
-        />
-      </div>
+          <div className="col-md-12 mb-2">
+            <label>Image URL / Description</label>
+            <input
+              type="text"
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
 
-      <div className="mb-3">
-        <label className="form-label">Sold Price</label>
-        <input 
-          type="number" 
-          step="0.01" 
-          name="soldPrice" 
-          className="form-control" 
-          value={formData.soldPrice} 
-          onChange={handleChange} 
-        />
+          <div className="form-group">
+            <label>Sold Date</label>
+            <input
+              type="date"
+              name="soldDate"
+              className="form-control"
+              value={formData.soldDate}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="form-group">
+            <label>Sold Price</label>
+            <input
+              type="number"
+              name="soldPrice"
+              className="form-control"
+              value={formData.soldPrice}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <button type="submit" className="btn btn-primary">Update</button>
       </div>
-
-      <button type="submit" className="btn btn-primary">Update</button>
-      <button 
-        type="button" 
-        className="btn btn-secondary ms-2" 
-        onClick={() => navigate("/trophies")}
-      >
-        Cancel
-      </button>
     </form>
   );
 };
