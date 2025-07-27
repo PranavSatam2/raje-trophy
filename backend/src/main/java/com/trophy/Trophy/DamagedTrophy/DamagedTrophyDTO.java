@@ -9,16 +9,9 @@ public class DamagedTrophyDTO {
     @NotBlank(message = "Trophy code is required")
     private String trophyCode;
 
-    @NotBlank(message = "Location is required")
-    private String location;
-
-    private Date doe;
-    private String image;
-
     @NotEmpty(message = "At least one size detail is required")
     private List<SizeDetail> sizes;
 
-    // ✅ Inner class with all required fields
     public static class SizeDetail {
 
         @NotNull(message = "Size is required")
@@ -36,8 +29,15 @@ public class DamagedTrophyDTO {
         @NotBlank(message = "Colour is required")
         private String colour;
 
-        private Double soldPrice;     // ✅ Newly added
-        private Date soldDate;        // ✅ Newly added
+        @NotBlank(message = "Location is required")
+        private String location;
+
+        private Date doe;
+
+        private String image;
+
+        private Double soldPrice;
+        private Date soldDate;
         private String remark;
 
         // ✅ Getters & Setters
@@ -96,6 +96,30 @@ public class DamagedTrophyDTO {
         public void setRemark(String remark) {
             this.remark = remark;
         }
+
+        public @NotBlank(message = "Location is required") String getLocation() {
+            return location;
+        }
+
+        public void setLocation(@NotBlank(message = "Location is required") String location) {
+            this.location = location;
+        }
+
+        public Date getDoe() {
+            return doe;
+        }
+
+        public void setDoe(Date doe) {
+            this.doe = doe;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
     }
 
     // ✅ Main DTO Getters & Setters
@@ -107,29 +131,6 @@ public class DamagedTrophyDTO {
         this.trophyCode = trophyCode;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Date getDoe() {
-        return doe;
-    }
-
-    public void setDoe(Date doe) {
-        this.doe = doe;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public List<SizeDetail> getSizes() {
         return sizes;

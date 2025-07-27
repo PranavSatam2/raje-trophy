@@ -42,10 +42,11 @@ public class Trophy {
     private String image;
 
     @PositiveOrZero(message = "Sold price cannot be negative")
+    @Column(nullable = true)
     private Double soldPrice;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "sold_date")
+    @Column(name = "sold_date",nullable = true)
     private Date soldDate;
 
     // ---------------------------

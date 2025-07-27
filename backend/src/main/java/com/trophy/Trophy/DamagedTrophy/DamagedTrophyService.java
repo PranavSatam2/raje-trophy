@@ -26,13 +26,15 @@ public class DamagedTrophyService {
         List<DamagedTrophy> damagedTrophies = dto.getSizes().stream().map(size -> {
             DamagedTrophy d = new DamagedTrophy();
             d.setTrophyCode(dto.getTrophyCode());
-            d.setLocation(dto.getLocation());
-            d.setDoe(dto.getDoe());
-            d.setImage(dto.getImage());
+            d.setLocation(size.getLocation());
+            d.setDoe(size.getDoe());
+            d.setImage(size.getImage());
             d.setSize(size.getSize());
             d.setPrice(size.getPrice());
             d.setQuantity(size.getQuantity());
             d.setColour(size.getColour());
+            d.setSoldDate(size.getSoldDate());
+            d.setSoldPrice(size.getSoldPrice());
             d.setRemark(size.getRemark());
             return d;
         }).collect(Collectors.toList());

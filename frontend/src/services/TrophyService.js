@@ -16,8 +16,10 @@ const TrophyService = {
 
   getTrophyByCode: (trophyCode, size) => axios.get(`${BASE_URL}/find/${trophyCode}/size/${size}`),
 
-updateTrophyByCodeAndSize: (trophyCode, size, data) =>
-  axios.put(`${BASE_URL}/update/${trophyCode}/size/${size}`, data),
-};
-
+  updateTrophyByCodeAndSize: (trophyCode, size, data) =>
+    axios.put(
+      `${BASE_URL}/update/${encodeURIComponent(trophyCode)}/size/${size}`,
+      data
+    ),
+  }
 export default TrophyService;

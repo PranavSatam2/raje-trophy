@@ -62,18 +62,21 @@ public class StoreAccService {
     // Update trophy by code and size
     @Transactional
     public void updateByTrophyCodeAndSize(String trophyCode, Double size, Trophy updatedData) {
-        Trophy existingTrophy = repository.findByTrophyCodeAndSize(trophyCode, size)
-                .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size));
+        Optional<Trophy> trophyOptional = Optional.ofNullable(repository.findByTrophyCodeAndSize(trophyCode, size)
+                .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size)));
 
         // Update fields (keeping trophyCode and size unchanged)
+        Trophy existingTrophy = trophyOptional.get();
+
+        // Update fields here
         existingTrophy.setPrice(updatedData.getPrice());
         existingTrophy.setQuantity(updatedData.getQuantity());
         existingTrophy.setColour(updatedData.getColour());
         existingTrophy.setLocation(updatedData.getLocation());
         existingTrophy.setDoe(updatedData.getDoe());
         existingTrophy.setImage(updatedData.getImage());
-        existingTrophy.setSoldDate(updatedData.getSoldDate());
         existingTrophy.setSoldPrice(updatedData.getSoldPrice());
+        existingTrophy.setSoldDate(updatedData.getSoldDate());
 
         repository.save(existingTrophy);
     }

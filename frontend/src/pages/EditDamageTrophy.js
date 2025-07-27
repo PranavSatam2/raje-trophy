@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TrophyService from "../services/TrophyService";
 
-const EditTrophy = () => {
+const EditDamageTrophy = () => {
   const { trophyCode, size } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ const EditTrophy = () => {
   useEffect(() => {
     console.log("Fetching trophy data for:", trophyCode, size);
 
-    TrophyService.getTrophyByCode(trophyCode, size)
+    TrophyService.get(trophyCode, size)
       .then((res) => {
         console.log("API Response:", res.data);
 
@@ -241,4 +241,4 @@ const EditTrophy = () => {
   );
 };
 
-export default EditTrophy;
+export default EditDamageTrophy;
