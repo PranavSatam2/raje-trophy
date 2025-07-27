@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan("com.trophy.Trophy")
+@EntityScan({"com.trophy.Trophy"})
 public class TrophyApplication {
 
 	public static void main(String[] args) {
