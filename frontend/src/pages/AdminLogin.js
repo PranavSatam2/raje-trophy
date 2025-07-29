@@ -1,21 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Footer from "../components/Footer"; // Optional
-import "./AdminLogin.css"; // Optional
+import LoginService from "../services/LoginService"; // Adjust path if needed
+import "./AdminLogin.css";
 
 function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Dummy login check (replace with API later)
-    if (email === "admin@gmail.com" && password === "admin@123") {
-      navigate("/admin/dashboard"); // Redirect to TrophyPage
-    } else {
-      alert("Invalid credentials");
+    try {
+      const response = await LoginService.login({
+        username: email,
+        password: password,
+      });
+
+      if (response.data === "Login successful!") {
+        navigate("/admin/dashboard");
+      } else {
+        alert("Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("An error occurred while logging in.");
     }
   };
 
@@ -26,9 +35,7 @@ function AdminLogin() {
 
         <form onSubmit={handleLogin}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
+            <label htmlFor="email" className="form-label">Email address</label>
             <input
               type="email"
               className="form-control"
@@ -41,9 +48,7 @@ function AdminLogin() {
           </div>
 
           <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label htmlFor="password" className="form-label">Password</label>
             <input
               type="password"
               className="form-control"
@@ -55,9 +60,7 @@ function AdminLogin() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100">
-            Login
-          </button>
+          <button type="submit" className="btn btn-primary w-100">Login</button>
 
           <div className="text-center mt-3">
             <small className="text-muted">Only authorized personnel allowed</small>
