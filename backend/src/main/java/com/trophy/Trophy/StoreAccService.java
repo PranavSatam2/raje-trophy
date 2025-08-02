@@ -1,6 +1,7 @@
 package com.trophy.Trophy;
 
 import java.sql.Date;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,30 +60,47 @@ public class StoreAccService {
                 .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size));
     }
 
-    // Update trophy by code and size
+    //Upadte the trophy by the code and size
     @Transactional
-    public void updateByTrophyCodeAndSize(String trophyCode, Double size, Trophy updatedData) {
-        Optional<Trophy> trophyOptional = Optional.ofNullable(repository.findByTrophyCodeAndSize(trophyCode, size)
-                .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode + " and size: " + size)));
+    public Trophy updateByTrophyCodeAndSize(String trophyCode, Double size, TrophyDTO.SizeDetail updatedDTO) {
+        Trophy existingTrophy = repository.findByTrophyCodeAndSize(trophyCode, size)
+                .orElseThrow(() -> new RuntimeException(
+                        " Trophy not found with code: " + trophyCode + " and size: " + size));
 
-        // Update fields (keeping trophyCode and size unchanged)
-        Trophy existingTrophy = trophyOptional.get();
+        if (updatedDTO.getPrice() != null) existingTrophy.setPrice(updatedDTO.getPrice());
+        if (updatedDTO.getQuantity() != null) existingTrophy.setQuantity(updatedDTO.getQuantity());
+        if (updatedDTO.getColour() != null) existingTrophy.setColour(updatedDTO.getColour());
+        if (updatedDTO.getLocation() != null) existingTrophy.setLocation(updatedDTO.getLocation());
+        if (updatedDTO.getImage() != null) existingTrophy.setImage(updatedDTO.getImage());
 
-        // Update fields here
-        existingTrophy.setPrice(updatedData.getPrice());
-        existingTrophy.setQuantity(updatedData.getQuantity());
-        existingTrophy.setColour(updatedData.getColour());
-        existingTrophy.setLocation(updatedData.getLocation());
-        existingTrophy.setDoe(updatedData.getDoe());
-        existingTrophy.setImage(updatedData.getImage());
-        existingTrophy.setSoldPrice(updatedData.getSoldPrice());
-        existingTrophy.setSoldDate(updatedData.getSoldDate());
+        //  Convert String -> Date here
+        if (updatedDTO.getDoe() != null) existingTrophy.setDoe(parseDate(updatedDTO.getDoe()));
+        if (updatedDTO.getSoldDate() != null) existingTrophy.setSoldDate(parseDate(updatedDTO.getSoldDate()));
+        if (updatedDTO.getSoldPrice() != null) existingTrophy.setSoldPrice(updatedDTO.getSoldPrice());
 
-        repository.save(existingTrophy);
+        return repository.save(existingTrophy);
     }
 
+    private Date parseDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) return null;
 
+        try {
+            //  ISO-8601 with timezone (2025-08-01T11:12:34.535+05:30)
+            return (Date) Date.from(java.time.OffsetDateTime.parse(dateStr).toInstant());
+        } catch (Exception ignored) {}
 
+        try {
+            //  ISO-8601 without timezone (2025-08-01T11:12:34.535)
+            return (Date) Date.from(java.time.LocalDateTime.parse(dateStr).atZone(ZoneId.systemDefault()).toInstant());
+        } catch (Exception ignored) {}
+
+        try {
+            //  yyyy-MM-dd (simple case)
+            return java.sql.Date.valueOf(dateStr);
+        } catch (Exception ignored) {}
+
+        throw new RuntimeException(" Date format not supported. Allowed: yyyy-MM-dd or ISO (yyyy-MM-dd'T'HH:mm:ss[.SSS][XXX])");
+    }
 
     // ✅ Delete trophies by trophyCode
     @Transactional

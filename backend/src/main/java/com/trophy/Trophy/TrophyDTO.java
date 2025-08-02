@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class TrophyDTO {
-    @NotBlank(message = "Trophy Code is required")
+    //    @NotBlank(message = "Trophy Code is required")
     private String trophyCode;
 
     @NotNull(message = "Size details are required")
@@ -102,7 +102,7 @@ public class TrophyDTO {
         }
     }
 
-    public @NotBlank(message = "Trophy Code is required") String getTrophyCode() {
+    public String getTrophyCode() {
         return trophyCode;
     }
 
@@ -110,9 +110,10 @@ public class TrophyDTO {
         return sizes;
     }
 
-    public void setTrophyCode(@NotBlank(message = "Trophy Code is required") String trophyCode) {
+    public void setTrophyCode(String trophyCode) {
         this.trophyCode = trophyCode;
     }
+
 
     public void setSizes(@NotNull(message = "Size details are required") List<SizeDetail> sizes) {
         this.sizes = sizes;

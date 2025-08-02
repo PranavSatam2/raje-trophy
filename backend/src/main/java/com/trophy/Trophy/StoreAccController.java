@@ -50,19 +50,21 @@ public class StoreAccController {
         }
     }
 
-    // Update trophy by code and size
+    //update trophy
     @PutMapping("/update/{trophyCode}/size/{size}")
-    public ResponseEntity<String> updateByTrophyCodeAndSize(
+    public ResponseEntity<?> updateByTrophyCodeAndSize(
             @PathVariable String trophyCode,
             @PathVariable Double size,
-            @RequestBody Trophy updatedTrophy) {
+            @Valid @RequestBody TrophyDTO dto) {
 
-        try {
-            service.updateByTrophyCodeAndSize(trophyCode, size, updatedTrophy);
-            return ResponseEntity.ok("Successfully updated trophy with code: " + trophyCode + " and size: " + size);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+        if (dto.getSizes() == null || dto.getSizes().isEmpty()) {
+            return ResponseEntity.badRequest().body(" Size details missing in request");
         }
+
+        TrophyDTO.SizeDetail updatedDTO = dto.getSizes().get(0);
+
+        Trophy updatedTrophy = service.updateByTrophyCodeAndSize(trophyCode, size, updatedDTO);
+        return ResponseEntity.ok(updatedTrophy);
     }
 
     // Get all trophies

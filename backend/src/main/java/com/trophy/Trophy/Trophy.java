@@ -12,7 +12,7 @@ public class Trophy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Trophy code is required")
+    //    @NotBlank(message = "Trophy code is required")
     @Column() // allow multiple entries with same trophy code but different size
     private String trophyCode;
 
