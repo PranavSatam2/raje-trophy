@@ -27,9 +27,9 @@ function Home() {
 
     window.Email.send({
       Host: "smtp.gmail.com",
-      Username: "tushar937297@gmail.com",
-      Password: "vvrv zmgo uboo gspf",  // ⚠️ Gmail App Password (not your real password)
-      To: "tushar937297@gmail.com",
+      Username: "<put your gmail account>",
+      Password: "<< gmail app password >>",  // ⚠️ Gmail App Password (not your real password)
+      To: "<<same gmail accout pick from contact details>>",
       From: e.target.email.value,
       Subject: "New Contact Form Inquiry",
       Body: `
