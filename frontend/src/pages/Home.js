@@ -11,14 +11,7 @@ function Home() {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 2000,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1
-        }
-      }
-    ]
+    responsive: [{ breakpoint: 768, settings: { slidesToShow: 1 } }]
   };
 
   const productImages = [
@@ -28,9 +21,29 @@ function Home() {
     { src: "/images/trophy4.jpg", title: "🥇 Glass Trophy" }
   ];
 
+  // ✅ Function to send email
+  function sendEmail(e) {
+    e.preventDefault();
+
+    window.Email.send({
+      Host: "smtp.gmail.com",
+      Username: "tushar937297@gmail.com",
+      Password: "vvrv zmgo uboo gspf",  // ⚠️ Gmail App Password (not your real password)
+      To: "tushar937297@gmail.com",
+      From: e.target.email.value,
+      Subject: "New Contact Form Inquiry",
+      Body: `
+        Name: ${e.target.name.value} <br/>
+        Email: ${e.target.email.value} <br/>
+        Message: ${e.target.message.value}
+      `
+    }).then((message) => alert("Message Sent Successfully ✅"))
+      .catch((err) => alert("Failed to send ❌ " + err));
+  }
+
   return (
     <div className="home-page">
-
+      
       {/* ✅ Welcome Section */}
       <section className="welcome-section" id="welcome">
         <h1>Welcome to TrophyZone 🏆</h1>
@@ -54,10 +67,10 @@ function Home() {
       {/* ✅ Contact Section */}
       <section id="contact" className="contact-section">
         <h2>Contact Us</h2>
-        <form className="contact-form">
-          <input type="text" placeholder="Your Name" required />
-          <input type="email" placeholder="Your Email" required />
-          <textarea rows="4" placeholder="Your Message" required></textarea>
+        <form className="contact-form" onSubmit={sendEmail}>
+          <input type="text" name="name" placeholder="Your Name" required />
+          <input type="email" name="email" placeholder="Your Email" required />
+          <textarea name="message" rows="4" placeholder="Your Message" required></textarea>
           <button type="submit">Send Inquiry</button>
         </form>
       </section>
