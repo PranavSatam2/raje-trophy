@@ -1,14 +1,11 @@
 package com.trophy.Trophy.DamagedTrophy;
 
 import com.trophy.Trophy.DamagedTrophy.DamagedTrophyDTO.SizeDetail;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,7 +16,6 @@ public class DamagedTrophyService {
     @Autowired
     private DamagedTrophyRepository repository;
 
-    // ✅ Save multiple damaged trophies with sizes
     public String saveMultipleDamagedTrophies(DamagedTrophyDTO dto) {
         logger.info("Saving damaged trophies for trophyCode: {}", dto.getTrophyCode());
 
@@ -40,31 +36,22 @@ public class DamagedTrophyService {
         }).collect(Collectors.toList());
 
         repository.saveAll(damagedTrophies);
-        logger.debug("Saved {} damaged trophies for trophyCode: {}", damagedTrophies.size(), dto.getTrophyCode());
-
         return "✅ Damaged trophies saved successfully";
     }
 
-    // ✅ Get all damaged trophies
     public List<DamagedTrophy> getAllDamagedTrophies() {
-        logger.info("Fetching all damaged trophies");
         return repository.findAll();
     }
 
-    // ✅ Get one by ID
     public List<DamagedTrophy> getDamagedTrophiesByTrophyCode(String trophyCode) {
-        logger.info("Fetching damaged trophies with trophyCode: {}", trophyCode);
         List<DamagedTrophy> list = repository.findByTrophyCode(trophyCode);
         if (list.isEmpty()) {
-            logger.warn("No damaged trophies found for trophyCode: {}", trophyCode);
             throw new RuntimeException("No damaged trophies found for trophyCode: " + trophyCode);
         }
         return list;
     }
 
-
-    @Transactional
-    public String updateByTrophyCodeAndSize(String trophyCode, Double size, DamagedTrophyDTO.SizeDetail sizeDetail) {
+    public String updateByTrophyCodeAndSize(String trophyCode, Double size, SizeDetail sizeDetail) {
         DamagedTrophy existing = repository.findByTrophyCodeAndSize(trophyCode, size)
                 .orElseThrow(() -> new RuntimeException("No damaged trophy found with trophyCode: " + trophyCode + " and size: " + size));
 
@@ -79,13 +66,7 @@ public class DamagedTrophyService {
         return "✅ Damaged trophy updated for trophyCode: " + trophyCode + " and size: " + size;
     }
 
-
-
-    // ✅ Delete by ID
-    @Transactional
     public void deleteByTrophyCodeAndSize(String trophyCode, Double size) {
         repository.deleteByTrophyCodeAndSize(trophyCode, size);
     }
-
-
 }

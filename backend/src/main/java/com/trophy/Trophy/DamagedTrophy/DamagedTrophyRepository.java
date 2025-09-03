@@ -1,15 +1,11 @@
 package com.trophy.Trophy.DamagedTrophy;
 
-import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface DamagedTrophyRepository extends JpaRepository<DamagedTrophy, Long> {
+public interface DamagedTrophyRepository extends MongoRepository<DamagedTrophy, String> {
     List<DamagedTrophy> findByTrophyCode(String trophyCode);
     Optional<DamagedTrophy> findByTrophyCodeAndSize(String trophyCode, Double size);
-
-    @Transactional
     void deleteByTrophyCodeAndSize(String trophyCode, Double size);
 }
