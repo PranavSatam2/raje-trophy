@@ -53,6 +53,15 @@ public class TrophyController {
         return ResponseEntity.ok(trophyService.getTrophyByCode(trophyCode));
     }
 
+    // Controller
+    @GetMapping("/find/{trophyCode}/size/{size}")
+    public ResponseEntity<SizeVariant> getTrophyByCodeAndSize(
+            @PathVariable String trophyCode,
+            @PathVariable String size) {
+        return ResponseEntity.ok(trophyService.getSizeByTrophyCodeAndSize(trophyCode, size));
+    }
+
+
     // UPDATE specific size of a trophy
     @PutMapping(value = "/{trophyCode}/size/{size}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Trophy> updateSizeVariant(

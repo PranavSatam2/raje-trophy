@@ -93,6 +93,7 @@ public class TrophyService {
             existingSize.setLocation(updatedSize.getLocation());
             existingSize.setSoldDate(updatedSize.getSoldDate());
             existingSize.setSoldPrice(updatedSize.getSoldPrice());
+            existingSize.setDoe(updatedSize.getDoe());
 
             // Replace image only if a new one is provided
             if (imageFile != null && !imageFile.isEmpty()) {
@@ -131,6 +132,19 @@ public class TrophyService {
                 .findFirst()
                 .map(SizeVariant::getImage)
                 .orElseThrow(() -> new RuntimeException("Image not found for size: " + size));
+    }
+
+
+    // Service
+    public SizeVariant getSizeByTrophyCodeAndSize(String trophyCode, String size) {
+        Optional<Trophy> optionalTrophy = trophyRepository.findByTrophyCode(trophyCode);
+        if (optionalTrophy.isPresent()) {
+            return optionalTrophy.get().getSizes().stream()
+                    .filter(s -> s.getSize().equals(size))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
     }
 
 }

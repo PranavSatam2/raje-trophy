@@ -12,6 +12,7 @@ public class SizeVariant {
     private String location;
     private String soldDate;
     private Double soldPrice;
+    private String doe;
 
     // Image will be stored as byte[] in MongoDB
     private byte[] image;
@@ -78,5 +79,13 @@ public class SizeVariant {
     }
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public String getDoe() {
+        return doe;
+    }
+
+    public void setDoe(String doe) {
+        this.doe = doe;
     }
 }
