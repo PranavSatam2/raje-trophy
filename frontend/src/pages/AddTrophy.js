@@ -89,7 +89,7 @@ function Trophy() {
     const response = await TrophyService.createTrophy(formDataToSend);
 
     console.log("✅ Trophy created:", response.data);
-    alert("Trophy created successfully!");
+    setMessage("✅ Trophy created successfully!");
 
     // 🧹 Reset the form state
     setFormData({
