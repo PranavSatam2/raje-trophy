@@ -29,13 +29,18 @@ const EditTrophy = () => {
   };
 
   useEffect(() => {
-  TrophyService.getTrophyByCode(trophyCode, size) // this calls /find/{code}/size/{size}
+  TrophyService.getTrophyByCode(trophyCode, size)
     .then((res) => {
-      const variant = res.data;
+      console.log("API Response:", res.data);
+      const trophy = res.data;
+
+      // Find the size variant that matches the requested size
+      const variant = trophy.sizes?.find((s) => s.size === size);
+
       if (variant) {
         setFormData({
           colour: variant.colour || "",
-          doe: formatDateForInput(variant.doe),
+          doe: variant.doe,
           location: variant.location || "",
           price: variant.price || "",
           quantity: variant.quantity || "",
@@ -47,7 +52,10 @@ const EditTrophy = () => {
             ? `data:image/jpeg;base64,${variant.image}`
             : ""
         });
+      } else {
+        setError(`No variant found for size: ${size}`);
       }
+
       setLoading(false);
     })
     .catch((err) => {
@@ -56,6 +64,7 @@ const EditTrophy = () => {
       setLoading(false);
     });
 }, [trophyCode, size]);
+
 
 
   const handleChange = (e) => {
@@ -85,6 +94,7 @@ const EditTrophy = () => {
     form.append("location", formData.location);
     form.append("soldDate", formData.soldDate);
     form.append("soldPrice", formData.soldPrice);
+    form.append("doe", formData.doe);
     if (formData.image) {
       form.append("imageFile", formData.image);
     }
@@ -172,7 +182,7 @@ const EditTrophy = () => {
               type="date"
               name="doe"
               value={formData.doe}
-              disabled
+              onChange={handleChange}
               className="form-control"
             />
           </div>
