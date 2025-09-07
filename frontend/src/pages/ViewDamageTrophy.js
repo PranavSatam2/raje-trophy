@@ -32,8 +32,8 @@ function ViewDamageTrophy() {
                         <th>Colour</th>
                         <th>Location</th>
                         <th>Date of Entry</th>
-                        <th>Sold Date</th>
-                        <th>Sold Price</th>
+                        {/* <th>Sold Date</th>
+                        <th>Sold Price</th> */}
                         <th>Remark</th>
                         <th>Image</th>
                         <th>Action</th>
@@ -49,8 +49,8 @@ function ViewDamageTrophy() {
                             <td>{trophy.colour}</td>
                             <td>{trophy.location}</td>
                             <td>{trophy.doe?.split("T")[0]}</td>
-                            <td>{trophy.soldDate?.split("T")[0]}</td>
-                            <td>₹{trophy.soldPrice}</td>
+                            {/* <td>{trophy.soldDate?.split("T")[0]}</td>
+                            <td>₹{trophy.soldPrice}</td> */}
                             <td>{trophy.remark || "—"}</td>
                             <td>
                                 {trophy.image ? (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TrophyService from "../services/TrophyService";
+import DamageTrophyService from "../services/DamageTrophyService";
 
 const EditDamageTrophy = () => {
   const { trophyCode, size } = useParams();
@@ -15,7 +16,8 @@ const EditDamageTrophy = () => {
     trophyCode: trophyCode || "",
     size: size || "",
     soldDate: "",
-    soldPrice: ""
+    soldPrice: "",
+    remark: ""
   });
 
   const [loading, setLoading] = useState(true);
@@ -37,7 +39,7 @@ const EditDamageTrophy = () => {
   useEffect(() => {
     console.log("Fetching trophy data for:", trophyCode, size);
 
-    TrophyService.get(trophyCode, size)
+    DamageTrophyService.getDamageTrophyByCode(trophyCode, size)
       .then((res) => {
         console.log("API Response:", res.data);
 
@@ -68,7 +70,8 @@ const EditDamageTrophy = () => {
             trophyCode: safeStringValue(matchingTrophy.trophyCode || trophyCode),
             size: safeStringValue(matchingTrophy.size || size),
             soldDate: formatDateForInput(matchingTrophy.soldDate),
-            soldPrice: safeStringValue(matchingTrophy.soldPrice)
+            soldPrice: safeStringValue(matchingTrophy.soldPrice),
+            remark: safeStringValue(matchingTrophy.remark),
           });
         } else {
           console.error("No matching trophy found for size:", size);
@@ -104,10 +107,10 @@ const EditDamageTrophy = () => {
 
     console.log("Submitting payload:", payload);
 
-    TrophyService.updateTrophyByCodeAndSize(trophyCode, size, payload)
+    DamageTrophyService.updateByTrophyCodeAndSize(trophyCode, size, payload)
       .then(() => {
         console.log("Update successful");
-        navigate("/trophies");
+        navigate("/admin/dashboard/view-damage-trophy");
       })
       .catch((err) => {
         console.error("Update failed:", err);
@@ -216,6 +219,17 @@ const EditDamageTrophy = () => {
           </div>
 
           <div className="col-md-5 mb-2">
+            <label>Remark</label>
+            <input
+              type="text"
+              name="remark"
+              value={formData.remark || ""}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+
+          {/* <div className="col-md-5 mb-2">
             <label>Sold Price</label>
             <input
               type="number"
@@ -223,8 +237,8 @@ const EditDamageTrophy = () => {
               value={formData.soldPrice || ""}
               onChange={handleChange}
             />
-          </div>
-          <div className="col-md-5 mb-4">
+          </div> */}
+          {/* <div className="col-md-5 mb-4">
             <label>Sold Date</label>
             <input
               type="date"
@@ -232,7 +246,7 @@ const EditDamageTrophy = () => {
               value={formData.soldDate ? formData.soldDate.split("T")[0] : ""}
               onChange={handleChange}
             />
-          </div>
+          </div> */}
 
         </div>
         <button type="submit" className="btn btn-primary">Update</button>

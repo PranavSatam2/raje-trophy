@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import TrophyService from "../services/TrophyService"; // adjust path as needed
+import TrophyService from "../services/TrophyService"; // ✅ Use Trophy service
+import FileService from "../services/FileService";
 
-function AddTrophy() {
+function Trophy() {
   const [formData, setFormData] = useState({
     trophyCode: "",
     sizes: [
@@ -20,8 +21,7 @@ function AddTrophy() {
   });
 
   const [message, setMessage] = useState("");
-
-
+  const [loading, setLoading] = useState(false);
 
   const handleTrophyCodeChange = (e) => {
     setFormData({ ...formData, trophyCode: e.target.value });
@@ -33,6 +33,17 @@ function AddTrophy() {
     updatedSizes[index][name] = value;
     setFormData({ ...formData, sizes: updatedSizes });
   };
+
+  const handleImageSelect = (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const updatedSizes = [...formData.sizes];
+    updatedSizes[index].imageFile = file;   // store file for backend
+    updatedSizes[index].imagePreview = URL.createObjectURL(file); // for preview
+    setFormData({ ...formData, sizes: updatedSizes });
+  };
+
 
   const addSizeField = () => {
     setFormData({
@@ -60,38 +71,60 @@ function AddTrophy() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      await TrophyService.createTrophy(formData);
-      setMessage("✅ Trophy added successfully!");
-      setFormData({
-        trophyCode: "",
-        sizes: [
-          {
-            size: "",
-            price: "",
-            quantity: "",
-            colour: "",
-            location: "",
-            doe: "",
-            image: "",
-            soldDate: "",
-            soldPrice: "",
-          },
-        ],
-      });
-    } catch (error) {
-      console.error("❌ Error adding trophy:", error);
-      setMessage("⚠️ Failed to add trophy. Please check console or backend.");
-    }
-  };
+  try {
+    const formDataToSend = new FormData();
+    formDataToSend.append("trophyCode", formData.trophyCode);
+
+    const cleanedSizes = formData.sizes.map(({ imageFile, imagePreview, ...rest }) => rest);
+    formDataToSend.append("sizeVariants", JSON.stringify(cleanedSizes));
+
+    formData.sizes.forEach((size) => {
+      if (size.imageFile) {
+        formDataToSend.append("imageFiles", size.imageFile);
+      }
+    });
+
+    const response = await TrophyService.createTrophy(formDataToSend);
+
+    console.log("✅ Trophy created:", response.data);
+    alert("Trophy created successfully!");
+
+    // 🧹 Reset the form state
+    setFormData({
+      trophyCode: "",
+      sizes: [
+        {
+          size: "",
+          price: "",
+          quantity: "",
+          colour: "",
+          location: "",
+          soldDate: "",
+          soldPrice: "",
+          imageFile: null,
+          imagePreview: null,
+        },
+      ],
+    });
+
+  } catch (error) {
+    console.error("❌ Error creating trophy:", error);
+    alert("Failed to create trophy");
+  }
+};
+
 
   return (
     <div className="container mt-4">
-      <h3 className="text-primary mb-3">Add New Trophy (with Multiple Sizes)</h3>
+      <h3 className="text-primary mb-3">Add Trophy (with Multiple Sizes)</h3>
 
-      {message && <div className="alert alert-info">{message}</div>}
+      {message && (
+        <div className={`alert ${message.includes("✅") ? "alert-success" : "alert-warning"}`}>
+          {message}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         {/* Trophy Code */}
@@ -121,6 +154,7 @@ function AddTrophy() {
                   value={entry.size}
                   onChange={(e) => handleSizeChange(index, e)}
                   className="form-control"
+                  step="0.01"
                   required
                 />
               </div>
@@ -146,6 +180,7 @@ function AddTrophy() {
                   value={entry.quantity}
                   onChange={(e) => handleSizeChange(index, e)}
                   className="form-control"
+                  min="1"
                   required
                 />
               </div>
@@ -190,16 +225,44 @@ function AddTrophy() {
                 />
               </div>
 
-              <div className="col-md-12 mb-2">
-                <label>Image URL / Description</label>
+              <div className="col-md-6 mb-2">
+                <label>Image</label>
+                <input type="file" accept="image/*" onChange={(e) => handleImageSelect(index, e)} className="form-control" />
+              </div>
+              <div className="col-md-6 mb-2">
+                <label>Preview</label>
+                <div>
+                  {entry.imagePreview ? (
+                    <img src={entry.imagePreview} alt="preview" style={{ maxWidth: 120 }} />
+                  ) : (
+                    <span>No image</span>
+                  )}
+                </div>
+              </div>
+
+              {/* <div className="col-md-3 mb-2">
+                <label>Sold Date</label>
                 <input
-                  type="text"
-                  name="image"
-                  value={entry.image}
-                  onChange={(e) => handleSizeChange(index, e)}
+                  type="date"
+                  name="soldDate"
                   className="form-control"
+                  value={entry.soldDate}
+                  onChange={(e) => handleSizeChange(index, e)}
                 />
               </div>
+
+              <div className="col-md-3 mb-2">
+                <label>Sold Price (₹)</label>
+                <input
+                  type="number"
+                  name="soldPrice"
+                  className="form-control"
+                  value={entry.soldPrice}
+                  onChange={(e) => handleSizeChange(index, e)}
+                  step="0.01"
+                  placeholder="Enter if sold"
+                />
+              </div> */}
             </div>
 
             {formData.sizes.length > 1 && (
@@ -223,12 +286,12 @@ function AddTrophy() {
         </button>
 
         <br />
-        <button type="submit" className="btn btn-success">
-          ✅ Submit Trophy
+        <button type="submit" className="btn btn-success" disabled={loading}>
+          {loading ? "⏳ Submitting..." : "✅ Submit Trophy"}
         </button>
       </form>
     </div>
   );
 }
 
-export default AddTrophy;
+export default Trophy;

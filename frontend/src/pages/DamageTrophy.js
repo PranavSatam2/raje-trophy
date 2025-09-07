@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DamageTrophyService from "../services/DamageTrophyService"; // Import the correct service
+import FileService from "../services/FileService";
 
 function DamageTrophy() {
   const [formData, setFormData] = useState({
@@ -32,6 +33,20 @@ function DamageTrophy() {
     const updatedSizes = [...formData.sizes];
     updatedSizes[index][name] = value;
     setFormData({ ...formData, sizes: updatedSizes });
+  };
+
+  const handleImageSelect = async (index, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const res = await FileService.upload(file);
+      const updatedSizes = [...formData.sizes];
+      updatedSizes[index].image = res.data.url;
+      setFormData({ ...formData, sizes: updatedSizes });
+    } catch (err) {
+      console.error("Image upload failed", err);
+      alert("Image upload failed");
+    }
   };
 
   const addSizeField = () => {
@@ -215,19 +230,18 @@ function DamageTrophy() {
                 />
               </div>
 
-              <div className="col-md-12 mb-2">
-                <label>Image URL / Description</label>
-                <input
-                  type="text"
-                  name="image"
-                  value={entry.image}
-                  onChange={(e) => handleSizeChange(index, e)}
-                  className="form-control"
-                  placeholder="Enter image URL or description"
-                />
+              <div className="col-md-6 mb-2">
+                <label>Image</label>
+                <input type="file" accept="image/*" onChange={(e) => handleImageSelect(index, e)} className="form-control" />
+              </div>
+              <div className="col-md-6 mb-2">
+                <label>Preview</label>
+                <div>
+                  {entry.image ? <img src={entry.image} alt="preview" style={{ maxWidth: 120 }} /> : <span>No image</span>}
+                </div>
               </div>
 
-              <div className="col-md-3 mb-2">
+              {/* <div className="col-md-3 mb-2">
                 <label>Sold Date</label>
                 <input
                   type="date"
@@ -249,7 +263,7 @@ function DamageTrophy() {
                   step="0.01"
                   placeholder="Enter if sold"
                 />
-              </div>
+              </div> */}
 
               <div className="col-md-6 mb-2">
                 <label>Damage Remark</label>

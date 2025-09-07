@@ -39,32 +39,41 @@ function ViewTrophy() {
           </tr>
         </thead>
         <tbody>
-          {trophies.map((trophy) => (
-            <tr key={trophy.id}>
-              <td>{trophy.trophyCode}</td>
-              <td>{trophy.size}"</td>
-              <td>₹{trophy.price}</td>
-              <td>{trophy.quantity}</td>
-              <td>{trophy.colour}</td>
-              <td>{trophy.location}</td>
-              <td>{trophy.doe?.split("T")[0]}</td>
-              <td>{trophy.soldDate?.split("T")[0]}</td>
-              <td>₹{trophy.soldPrice}</td>
-              <td>
-                {trophy.image ? (
-                  <img src={trophy.image} alt="trophy" width="50" />
-                ) : (
-                  "N/A"
-                )}
-              </td>
-              <td>
-                <button className="btn btn-warning me-2 mb-1">
-                  <Link to={`/admin/dashboard/edit/${trophy.trophyCode}/${trophy.size}`}>Edit</Link>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+  {trophies.map((trophy) =>
+    trophy.sizes.map((variant, index) => (
+      <tr key={`${trophy.id}-${index}`}>
+        <td>{trophy.trophyCode}</td>
+        <td>{variant.size}"</td>
+        <td>₹{variant.price}</td>
+        <td>{variant.quantity}</td>
+        <td>{variant.colour}</td>
+        <td>{variant.location}</td>
+        <td>{variant.doe ? variant.doe.split("T")[0] : ""}</td>
+        <td>{variant.soldDate ? variant.soldDate.split("T")[0] : ""}</td>
+        <td>₹{variant.soldPrice}</td>
+        <td>
+          {variant.image ? (
+            <img
+              src={`data:image/jpeg;base64,${variant.image}`}
+              alt="trophy"
+              width="50"
+            />
+          ) : (
+            "N/A"
+          )}
+        </td>
+        <td>
+          <button className="btn btn-warning me-2 mb-1">
+            <Link to={`/admin/dashboard/edit/${trophy.trophyCode}/${variant.size}`}>
+              Edit
+            </Link>
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
       </table>
     </div>
   );
