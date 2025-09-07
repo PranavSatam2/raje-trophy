@@ -71,6 +71,7 @@ public class TrophyController {
             @RequestParam int quantity,
             @RequestParam String colour,
             @RequestParam String location,
+            @RequestParam String doe,
             @RequestParam(required = false) String soldDate,
             @RequestParam(required = false) Double soldPrice,
             @RequestPart(required = false) MultipartFile imageFile
@@ -81,12 +82,21 @@ public class TrophyController {
         updatedSize.setQuantity(quantity);
         updatedSize.setColour(colour);
         updatedSize.setLocation(location);
+
+        // ✅ Add doe mapping
+        updatedSize.setDoe(doe);
+
         updatedSize.setSoldDate(soldDate);
         updatedSize.setSoldPrice(soldPrice);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            updatedSize.setImage(imageFile.getBytes());
+        }
 
         Trophy updatedTrophy = trophyService.updateSizeVariant(trophyCode, size, updatedSize, imageFile);
         return ResponseEntity.ok(updatedTrophy);
     }
+
 
 
     // DELETE trophy
