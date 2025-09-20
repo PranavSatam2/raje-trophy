@@ -1,9 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL_DAMAGE = "http://localhost:8080/api/damaged-trophies";
+const BASE_URL_DAMAGE = "http://localhost:8080/api/damage-trophies";
 
 const DamageTrophyService = {
-  createDamageTrophy: (data) => axios.post(`${BASE_URL_DAMAGE}/add`, data),
+  createDamageTrophy: (formData) =>
+    axios.post(`${BASE_URL_DAMAGE}/create`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 
   getAllDamageTrophies: () => axios.get(`${BASE_URL_DAMAGE}`),
 

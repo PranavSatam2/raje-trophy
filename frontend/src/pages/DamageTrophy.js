@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import DamageTrophyService from "../services/DamageTrophyService"; // Import the correct service
-import FileService from "../services/FileService";
+import DamageTrophyService from "../services/DamageTrophyService";
 
 function DamageTrophy() {
   const [formData, setFormData] = useState({
@@ -13,10 +12,8 @@ function DamageTrophy() {
         colour: "",
         location: "",
         doe: "",
+        damageRemark: "", // ✅ NEW FIELD
         image: "",
-        soldDate: "",
-        soldPrice: "",
-        remark: "",
       },
     ],
   });
@@ -35,18 +32,14 @@ function DamageTrophy() {
     setFormData({ ...formData, sizes: updatedSizes });
   };
 
-  const handleImageSelect = async (index, e) => {
+  const handleImageSelect = (index, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    try {
-      const res = await FileService.upload(file);
-      const updatedSizes = [...formData.sizes];
-      updatedSizes[index].image = res.data.url;
-      setFormData({ ...formData, sizes: updatedSizes });
-    } catch (err) {
-      console.error("Image upload failed", err);
-      alert("Image upload failed");
-    }
+
+    const updatedSizes = [...formData.sizes];
+    updatedSizes[index].imageFile = file;
+    updatedSizes[index].imagePreview = URL.createObjectURL(file);
+    setFormData({ ...formData, sizes: updatedSizes });
   };
 
   const addSizeField = () => {
@@ -61,10 +54,8 @@ function DamageTrophy() {
           colour: "",
           location: "",
           doe: "",
+          damageRemark: "", // ✅
           image: "",
-          soldDate: "",
-          soldPrice: "",
-          remark: "",
         },
       ],
     });
@@ -77,16 +68,30 @@ function DamageTrophy() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
-      // Use DamageTrophyService instead of TrophyService
-      const response = await DamageTrophyService.createDamageTrophy(formData);
-      console.log("✅ Damage trophy created successfully:", response.data);
-      
-      setMessage("✅ Damage trophy added successfully!");
-      
-      // Reset form
+      const formDataToSend = new FormData();
+      formDataToSend.append("trophyCode", formData.trophyCode);
+
+      // send all size data except imageFile & preview
+      const cleanedSizes = formData.sizes.map(({ imageFile, imagePreview, ...rest }) => rest);
+      formDataToSend.append("sizeVariants", JSON.stringify(cleanedSizes));
+
+      // add images
+      formData.sizes.forEach((size) => {
+        if (size.imageFile) {
+          formDataToSend.append("imageFiles", size.imageFile);
+        }
+      });
+
+      // ⚠️ call your new DamageTrophy API endpoint here:
+      console.log("Submitting Damage Trophy:", formDataToSend);
+      setLoading(true);
+      const response = await DamageTrophyService.createDamageTrophy(formDataToSend);
+
+      console.log("✅ Damage Trophy created:", response.data);
+      setMessage("✅ Damage Trophy created successfully!");
+
+      // reset form
       setFormData({
         trophyCode: "",
         sizes: [
@@ -97,36 +102,24 @@ function DamageTrophy() {
             colour: "",
             location: "",
             doe: "",
-            image: "",
-            soldDate: "",
-            soldPrice: "",
-            remark: "",
+            damageRemark: "",
+            imageFile: null,
+            imagePreview: null,
           },
         ],
       });
     } catch (error) {
-      console.error("❌ Error adding damage trophy:", error);
-      console.error("Error details:", error.response?.data);
-      
-      // More specific error messages
-      if (error.response?.status === 400) {
-        setMessage("⚠️ Invalid data provided. Please check all fields.");
-      } else if (error.response?.status === 500) {
-        setMessage("⚠️ Server error. Please try again later.");
-      } else {
-        setMessage("⚠️ Failed to add damage trophy. Please check console for details.");
-      }
-    } finally {
-      setLoading(false);
+      console.error("❌ Error creating damage trophy:", error);
+      alert("Failed to create damage trophy");
     }
   };
 
   return (
     <div className="container mt-4">
-      <h3 className="text-primary mb-3">Add Damage Trophy (with Multiple Sizes)</h3>
+      <h3 className="text-danger mb-3">Add Damage Trophy (with Multiple Sizes)</h3>
 
       {message && (
-        <div className={`alert ${message.includes('✅') ? 'alert-success' : 'alert-warning'}`}>
+        <div className={`alert ${message.includes("✅") ? "alert-success" : "alert-warning"}`}>
           {message}
         </div>
       )}
@@ -148,18 +141,17 @@ function DamageTrophy() {
         {/* Size Entries */}
         {formData.sizes.map((entry, index) => (
           <div key={index} className="card mb-3 p-3 shadow-sm">
-            <h5 className="text-secondary">Size Entry #{index + 1}</h5>
+            <h5 className="text-secondary">Damage Size Entry #{index + 1}</h5>
 
             <div className="row">
               <div className="col-md-2 mb-2">
-                <label>Size (inches)</label>
+                <label>Size</label>
                 <input
                   type="number"
                   name="size"
                   value={entry.size}
                   onChange={(e) => handleSizeChange(index, e)}
                   className="form-control"
-                  step="0.01"
                   required
                 />
               </div>
@@ -172,7 +164,6 @@ function DamageTrophy() {
                   value={entry.price}
                   onChange={(e) => handleSizeChange(index, e)}
                   className="form-control"
-                  step="0.01"
                   required
                 />
               </div>
@@ -185,7 +176,6 @@ function DamageTrophy() {
                   value={entry.quantity}
                   onChange={(e) => handleSizeChange(index, e)}
                   className="form-control"
-                  min="1"
                   required
                 />
               </div>
@@ -230,51 +220,38 @@ function DamageTrophy() {
                 />
               </div>
 
-              <div className="col-md-6 mb-2">
-                <label>Image</label>
-                <input type="file" accept="image/*" onChange={(e) => handleImageSelect(index, e)} className="form-control" />
-              </div>
-              <div className="col-md-6 mb-2">
-                <label>Preview</label>
-                <div>
-                  {entry.image ? <img src={entry.image} alt="preview" style={{ maxWidth: 120 }} /> : <span>No image</span>}
-                </div>
-              </div>
-
-              {/* <div className="col-md-3 mb-2">
-                <label>Sold Date</label>
-                <input
-                  type="date"
-                  name="soldDate"
-                  className="form-control"
-                  value={entry.soldDate}
-                  onChange={(e) => handleSizeChange(index, e)}
-                />
-              </div>
-
-              <div className="col-md-3 mb-2">
-                <label>Sold Price (₹)</label>
-                <input
-                  type="number"
-                  name="soldPrice"
-                  className="form-control"
-                  value={entry.soldPrice}
-                  onChange={(e) => handleSizeChange(index, e)}
-                  step="0.01"
-                  placeholder="Enter if sold"
-                />
-              </div> */}
-
-              <div className="col-md-6 mb-2">
+              <div className="col-md-4 mb-2">
                 <label>Damage Remark</label>
                 <input
                   type="text"
-                  name="remark"
-                  className="form-control"
-                  value={entry.remark}
+                  name="damageRemark"
+                  value={entry.damageRemark}
                   onChange={(e) => handleSizeChange(index, e)}
-                  placeholder="Describe the damage"
+                  className="form-control"
+                  placeholder="Describe damage"
+                  required
                 />
+              </div>
+
+              <div className="col-md-6 mb-2">
+                <label>Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageSelect(index, e)}
+                  className="form-control"
+                />
+              </div>
+
+              <div className="col-md-6 mb-2">
+                <label>Preview</label>
+                <div>
+                  {entry.imagePreview ? (
+                    <img src={entry.imagePreview} alt="preview" style={{ maxWidth: 120 }} />
+                  ) : (
+                    <span>No image</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -295,7 +272,7 @@ function DamageTrophy() {
           onClick={addSizeField}
           className="btn btn-secondary mb-3"
         >
-          ➕ Add Another Size
+          ➕ Add Another Damage Size
         </button>
 
         <br />
