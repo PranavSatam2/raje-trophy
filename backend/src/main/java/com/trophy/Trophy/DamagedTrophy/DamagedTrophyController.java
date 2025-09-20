@@ -1,60 +1,141 @@
 package com.trophy.Trophy.DamagedTrophy;
 
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/damaged-trophies")
-@CrossOrigin(origins = "http://localhost:3000")
+@RestController // Marks this class as a REST API controller
+@RequestMapping("/api/damage-trophies") // Base URL for all endpoints in this controller
+@CrossOrigin(origins = "*") // Allow CORS from any origin (React frontend)
 public class DamagedTrophyController {
 
-    public DamagedTrophyController() {
-        System.out.println("✅ DamagedTrophyController Initialized");
+    private final DamagedTrophyService damagedTrophyService;
+
+    public DamagedTrophyController(DamagedTrophyService damagedTrophyService) {
+        this.damagedTrophyService = damagedTrophyService;
     }
 
-    @Autowired
-    private DamagedTrophyService service;
+    /**
+     * Create a new Damaged Trophy with multiple SizeVariants and optional images.
+     *
+     * @param trophyCode       unique code for the trophy
+     * @param sizeVariantsJson JSON string of size variants
+     * @param imageFiles       optional list of images for each size variant
+     */
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DamagedTrophy> createTrophy(
+            @RequestParam String trophyCode,
+            @RequestPart("sizeVariants") String sizeVariantsJson,
+            @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles
+    ) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        List<SizeVariantDamage> sizeVariants =
+                mapper.readValue(sizeVariantsJson, new TypeReference<List<SizeVariantDamage>>() {
+                });
+        DamagedTrophy savedTrophy =
+                damagedTrophyService.addMultipleSizes(trophyCode, sizeVariants, imageFiles);
 
-    // ✅ 1. Get all damaged trophies
+        return ResponseEntity.ok(savedTrophy);
+    }
+
+    /**
+     * Fetch all Damaged Trophies
+     */
     @GetMapping
-    public List<DamagedTrophy> getAllDamagedTrophies() {
-        return service.getAllDamagedTrophies();
+    public List<DamagedTrophy> getAllTrophies() {
+        return damagedTrophyService.getAllTrophies();
     }
 
-    // ✅ 2. Get one damaged trophy by ID
-    @GetMapping("/code/{trophyCode}")
-    public ResponseEntity<List<DamagedTrophy>> getByTrophyCode(@PathVariable String trophyCode) {
-        List<DamagedTrophy> list = service.getDamagedTrophiesByTrophyCode(trophyCode);
-        return ResponseEntity.ok(list);
+    /**
+     * Get a Damaged Trophy by its code
+     */
+    @GetMapping("/{trophyCode}")
+    public ResponseEntity<Optional<DamagedTrophy>> getTrophyByCode(@PathVariable String trophyCode) {
+        return ResponseEntity.ok(damagedTrophyService.getTrophyByCode(trophyCode));
     }
 
-    // ✅ 3. Save multiple damaged trophies using DTO with size + remark
-    @PostMapping("/add")
-    public ResponseEntity<String> saveMultipleDamagedTrophies(@Valid @RequestBody DamagedTrophyDTO dto) {
-        String result = service.saveMultipleDamagedTrophies(dto);
-        return ResponseEntity.ok(result);
+    /**
+     * Get a specific size variant of a Damaged Trophy
+     */
+    @GetMapping("/find/{trophyCode}/size/{size}")
+    public ResponseEntity<SizeVariantDamage> getTrophyByCodeAndSize(
+            @PathVariable String trophyCode,
+            @PathVariable String size) {
+        return ResponseEntity.ok(damagedTrophyService.getSizeByTrophyCodeAndSize(trophyCode, size));
     }
 
-    // ✅ Update by trophyCode and size
-    @PutMapping("/update/code/{trophyCode}/size/{size}")
-    public ResponseEntity<String> updateByTrophyCodeAndSize(@PathVariable String trophyCode,
-                                                            @PathVariable Double size,
-                                                            @RequestBody DamagedTrophyDTO.SizeDetail sizeDetail) {
-        String result = service.updateByTrophyCodeAndSize(trophyCode, size, sizeDetail);
-        return ResponseEntity.ok(result);
+    /**
+     * Update a specific size variant of a Damaged Trophy
+     */
+    @PutMapping(value = "/{trophyCode}/size/{size}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DamagedTrophy> updateSizeVariant(
+            @PathVariable String trophyCode,
+            @PathVariable String size,
+            @RequestParam double price,
+            @RequestParam int quantity,
+            @RequestParam String colour,
+            @RequestParam String location,
+            @RequestParam String doe,
+            @RequestParam(required = false) String soldDate,
+            @RequestParam(required = false) Double soldPrice,
+            @RequestPart(required = false) MultipartFile imageFile
+    ) throws IOException {
+        SizeVariantDamage updatedSize = new SizeVariantDamage();
+        updatedSize.setSize(size);
+        updatedSize.setPrice(price);
+        updatedSize.setQuantity(quantity);
+        updatedSize.setColour(colour);
+        updatedSize.setLocation(location);
+        updatedSize.setDoe(doe);
+        updatedSize.setSoldDate(soldDate);
+        updatedSize.setSoldPrice(soldPrice);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            updatedSize.setImage(imageFile.getBytes());
+        }
+
+        DamagedTrophy updatedTrophy =
+                damagedTrophyService.updateSizeVariant(trophyCode, size, updatedSize, imageFile);
+        return ResponseEntity.ok(updatedTrophy);
     }
 
-    // ✅ Delete by trophyCode and size
-    @DeleteMapping("/delete/code/{trophyCode}/size/{size}")
-    public ResponseEntity<String> deleteByTrophyCodeAndSize(@PathVariable String trophyCode,
-                                                            @PathVariable Double size) {
-        service.deleteByTrophyCodeAndSize(trophyCode, size);
-        return ResponseEntity.ok("Deleted damaged trophy with trophyCode: " + trophyCode + " and size: " + size);
+    /**
+     * Delete an entire Damaged Trophy by code
+     */
+    @DeleteMapping("/{trophyCode}")
+    public ResponseEntity<Void> deleteTrophy(@PathVariable String trophyCode) {
+        damagedTrophyService.deleteTrophy(trophyCode);
+        return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Delete a size variant from a Damaged Trophy
+     */
+    @DeleteMapping("/{trophyCode}/size/{size}")
+    public ResponseEntity<DamagedTrophy> deleteSizeVariant(@PathVariable String trophyCode,
+                                                           @PathVariable String size) {
+        DamagedTrophy updatedTrophy = damagedTrophyService.deleteSizeVariant(trophyCode, size);
+        return ResponseEntity.ok(updatedTrophy);
+    }
 
+    /**
+     * Fetch the stored image of a specific size variant of a Damaged Trophy
+     */
+    @GetMapping("/{trophyCode}/size/{size}/image")
+    public ResponseEntity<byte[]> getTrophyImage(
+            @PathVariable String trophyCode,
+            @PathVariable String size
+    ) {
+        byte[] image = damagedTrophyService.getImageByTrophyCodeAndSize(trophyCode, size);
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(image);
+    }
 }

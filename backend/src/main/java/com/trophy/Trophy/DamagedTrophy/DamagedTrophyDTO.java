@@ -1,120 +1,99 @@
 package com.trophy.Trophy.DamagedTrophy;
 
+import com.trophy.Trophy.TrophyDTO;
 import jakarta.validation.constraints.*;
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 
 public class DamagedTrophyDTO {
 
-    @NotBlank(message = "Trophy code is required")
     private String trophyCode;
 
-    @NotEmpty(message = "At least one size detail is required")
-    private List<SizeDetail> sizes;
+    @NotNull(message = "Size details are required")
+    private List<TrophyDTO.SizeDetail> sizes;
 
+    @Data
     public static class SizeDetail {
-
-        @NotNull(message = "Size is required")
-        @Positive(message = "Size must be positive")
         private Double size;
-
-        @NotNull(message = "Price is required")
-        @PositiveOrZero(message = "Price cannot be negative")
         private Double price;
-
-        @NotNull(message = "Quantity is required")
-        @Min(value = 0, message = "Quantity cannot be negative")
         private Integer quantity;
-
-        @NotBlank(message = "Colour is required")
         private String colour;
-
-        @NotBlank(message = "Location is required")
         private String location;
-
-        private Date doe;
-
+        private String doe;
         private String image;
-
         private Double soldPrice;
-        private Date soldDate;
-        private String remark;
+        private String soldDate;
 
-        // ✅ Getters & Setters
-        public Double getSize() {
-            return size;
+
+        public void setSoldPrice(Double soldPrice) {
+            this.soldPrice = soldPrice;
         }
 
-        public void setSize(Double size) {
-            this.size = size;
-        }
-
-        public Double getPrice() {
-            return price;
-        }
-
-        public void setPrice(Double price) {
-            this.price = price;
-        }
-
-        public Integer getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(Integer quantity) {
-            this.quantity = quantity;
-        }
-
-        public String getColour() {
-            return colour;
-        }
-
-        public void setColour(String colour) {
-            this.colour = colour;
+        public void setSoldDate(String soldDate) {
+            this.soldDate = soldDate;
         }
 
         public Double getSoldPrice() {
             return soldPrice;
         }
 
-        public void setSoldPrice(Double soldPrice) {
-            this.soldPrice = soldPrice;
-        }
-
-        public Date getSoldDate() {
+        public String getSoldDate() {
             return soldDate;
         }
 
-        public void setSoldDate(Date soldDate) {
-            this.soldDate = soldDate;
+
+        public Double getSize() {
+            return size;
         }
 
-        public String getRemark() {
-            return remark;
+        public Double getPrice() {
+            return price;
         }
 
-        public void setRemark(String remark) {
-            this.remark = remark;
+        public Integer getQuantity() {
+            return quantity;
         }
 
-        public @NotBlank(message = "Location is required") String getLocation() {
+        public String getColour() {
+            return colour;
+        }
+
+        public String getLocation() {
             return location;
         }
 
-        public void setLocation(@NotBlank(message = "Location is required") String location) {
-            this.location = location;
-        }
-
-        public Date getDoe() {
+        public String getDoe() {
             return doe;
-        }
-
-        public void setDoe(Date doe) {
-            this.doe = doe;
         }
 
         public String getImage() {
             return image;
+        }
+
+        public void setSize(Double size) {
+            this.size = size;
+        }
+
+        public void setPrice(Double price) {
+            this.price = price;
+        }
+
+        public void setQuantity(Integer quantity) {
+            this.quantity = quantity;
+        }
+
+        public void setColour(String colour) {
+            this.colour = colour;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public void setDoe(String doe) {
+            this.doe = doe;
         }
 
         public void setImage(String image) {
@@ -122,9 +101,12 @@ public class DamagedTrophyDTO {
         }
     }
 
-    // ✅ Main DTO Getters & Setters
     public String getTrophyCode() {
         return trophyCode;
+    }
+
+    public @NotNull(message = "Size details are required") List<TrophyDTO.SizeDetail> getSizes() {
+        return sizes;
     }
 
     public void setTrophyCode(String trophyCode) {
@@ -132,11 +114,7 @@ public class DamagedTrophyDTO {
     }
 
 
-    public List<SizeDetail> getSizes() {
-        return sizes;
-    }
-
-    public void setSizes(List<SizeDetail> sizes) {
+    public void setSizes(@NotNull(message = "Size details are required") List<TrophyDTO.SizeDetail> sizes) {
         this.sizes = sizes;
     }
 }

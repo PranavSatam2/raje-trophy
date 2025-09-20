@@ -1,72 +1,150 @@
 package com.trophy.Trophy.DamagedTrophy;
 
-import com.trophy.Trophy.DamagedTrophy.DamagedTrophyDTO.SizeDetail;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class DamagedTrophyService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DamagedTrophyService.class);
+    private final DamagedTrophyRepository damagedTrophyRepository;
 
-    @Autowired
-    private DamagedTrophyRepository repository;
-
-    public String saveMultipleDamagedTrophies(DamagedTrophyDTO dto) {
-        logger.info("Saving damaged trophies for trophyCode: {}", dto.getTrophyCode());
-
-        List<DamagedTrophy> damagedTrophies = dto.getSizes().stream().map(size -> {
-            DamagedTrophy d = new DamagedTrophy();
-            d.setTrophyCode(dto.getTrophyCode());
-            d.setLocation(size.getLocation());
-            d.setDoe(size.getDoe());
-            d.setImage(size.getImage());
-            d.setSize(size.getSize());
-            d.setPrice(size.getPrice());
-            d.setQuantity(size.getQuantity());
-            d.setColour(size.getColour());
-            d.setSoldDate(size.getSoldDate());
-            d.setSoldPrice(size.getSoldPrice());
-            d.setRemark(size.getRemark());
-            return d;
-        }).collect(Collectors.toList());
-
-        repository.saveAll(damagedTrophies);
-        return "✅ Damaged trophies saved successfully";
+    public DamagedTrophyService(DamagedTrophyRepository damagedTrophyRepository) {
+        this.damagedTrophyRepository = damagedTrophyRepository;
     }
 
-    public List<DamagedTrophy> getAllDamagedTrophies() {
-        return repository.findAll();
-    }
+    // Create or Add SizeVariant to Trophy
+    public DamagedTrophy addTrophy(String trophyCode, SizeVariantDamage sizeVariantDamage, MultipartFile imageFile) throws IOException {
+        Optional<DamagedTrophy> existingTrophy = damagedTrophyRepository.findByTrophyCode(trophyCode);
 
-    public List<DamagedTrophy> getDamagedTrophiesByTrophyCode(String trophyCode) {
-        List<DamagedTrophy> list = repository.findByTrophyCode(trophyCode);
-        if (list.isEmpty()) {
-            throw new RuntimeException("No damaged trophies found for trophyCode: " + trophyCode);
+        if (imageFile != null && !imageFile.isEmpty()) {
+            sizeVariantDamage.setImage(imageFile.getBytes());
         }
-        return list;
+
+        if (existingTrophy.isPresent()) {
+            // Add new size to existing trophy
+            DamagedTrophy trophy = existingTrophy.get();
+            trophy.getSizes().add(sizeVariantDamage);
+            return damagedTrophyRepository.save(trophy);
+        } else {
+            // Create new trophy
+            DamagedTrophy trophy = new DamagedTrophy();
+            trophy.setTrophyCode(trophyCode);
+            trophy.getSizes().add(sizeVariantDamage);
+            return damagedTrophyRepository.save(trophy);
+        }
     }
 
-    public String updateByTrophyCodeAndSize(String trophyCode, Double size, SizeDetail sizeDetail) {
-        DamagedTrophy existing = repository.findByTrophyCodeAndSize(trophyCode, size)
-                .orElseThrow(() -> new RuntimeException("No damaged trophy found with trophyCode: " + trophyCode + " and size: " + size));
+    public DamagedTrophy addMultipleSizes(String trophyCode, List<SizeVariantDamage> sizeVariants, List<MultipartFile> imageFiles) throws IOException {
+        DamagedTrophy trophy = damagedTrophyRepository.findByTrophyCode(trophyCode).orElse(new DamagedTrophy());
+        trophy.setTrophyCode(trophyCode);
 
-        if (sizeDetail.getPrice() != null) existing.setPrice(sizeDetail.getPrice());
-        if (sizeDetail.getQuantity() != null) existing.setQuantity(sizeDetail.getQuantity());
-        if (sizeDetail.getColour() != null) existing.setColour(sizeDetail.getColour());
-        if (sizeDetail.getSoldPrice() != null) existing.setSoldPrice(sizeDetail.getSoldPrice());
-        if (sizeDetail.getSoldDate() != null) existing.setSoldDate(sizeDetail.getSoldDate());
-        if (sizeDetail.getRemark() != null) existing.setRemark(sizeDetail.getRemark());
+        for (int i = 0; i < sizeVariants.size(); i++) {
+            SizeVariantDamage variant = sizeVariants.get(i);
 
-        repository.save(existing);
-        return "✅ Damaged trophy updated for trophyCode: " + trophyCode + " and size: " + size;
+            if (imageFiles != null && imageFiles.size() > i) {
+                MultipartFile imageFile = imageFiles.get(i);
+                if (imageFile != null && !imageFile.isEmpty()) {
+                    variant.setImage(imageFile.getBytes());
+                }
+            }
+
+            trophy.getSizes().add(variant);
+        }
+
+        return damagedTrophyRepository.save(trophy);
     }
 
-    public void deleteByTrophyCodeAndSize(String trophyCode, Double size) {
-        repository.deleteByTrophyCodeAndSize(trophyCode, size);
+
+    // Get all trophies
+    public List<DamagedTrophy> getAllTrophies() {
+        return damagedTrophyRepository.findAll();
     }
+
+    // Get by TrophyCode
+    public Optional<DamagedTrophy> getTrophyByCode(String trophyCode) {
+        return damagedTrophyRepository.findByTrophyCode(trophyCode);
+    }
+
+    public DamagedTrophy updateSizeVariant(String trophyCode, String size, SizeVariantDamage updatedSize, MultipartFile imageFile) throws IOException {
+        Optional<DamagedTrophy> optionalTrophy = damagedTrophyRepository.findByTrophyCode(trophyCode);
+
+        if (optionalTrophy.isPresent()) {
+            DamagedTrophy trophy = optionalTrophy.get();
+
+            // Find existing size
+            SizeVariantDamage existingSize = trophy.getSizes()
+                    .stream()
+                    .filter(s -> s.getSize().equals(size))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingSize == null) {
+                throw new RuntimeException("Size " + size + " not found for TrophyCode " + trophyCode);
+            }
+
+            // Update only changed fields
+            existingSize.setPrice(updatedSize.getPrice());
+            existingSize.setQuantity(updatedSize.getQuantity());
+            existingSize.setColour(updatedSize.getColour());
+            existingSize.setLocation(updatedSize.getLocation());
+            existingSize.setSoldDate(updatedSize.getSoldDate());
+            existingSize.setSoldPrice(updatedSize.getSoldPrice());
+            existingSize.setDoe(updatedSize.getDoe());
+
+            // Replace image only if a new one is provided
+            if (imageFile != null && !imageFile.isEmpty()) {
+                existingSize.setImage(imageFile.getBytes());
+            }
+
+            return damagedTrophyRepository.save(trophy);
+        }
+
+        throw new RuntimeException("Trophy with code " + trophyCode + " not found");
+    }
+
+    // Delete entire trophy
+    public void deleteTrophy(String trophyCode) {
+        damagedTrophyRepository.deleteByTrophyCode(trophyCode);
+    }
+
+    // Delete a specific size
+    public DamagedTrophy deleteSizeVariant(String trophyCode, String size) {
+        Optional<DamagedTrophy> optionalTrophy = damagedTrophyRepository.findByTrophyCode(trophyCode);
+        if (optionalTrophy.isPresent()) {
+            DamagedTrophy trophy = optionalTrophy.get();
+            trophy.getSizes().removeIf(s -> s.getSize().equals(size));
+            return damagedTrophyRepository.save(trophy);
+        }
+        return null;
+    }
+
+    // Get image for a specific trophyCode and size
+    public byte[] getImageByTrophyCodeAndSize(String trophyCode, String size) {
+        DamagedTrophy trophy = damagedTrophyRepository.findByTrophyCode(trophyCode)
+                .orElseThrow(() -> new RuntimeException("Trophy not found with code: " + trophyCode));
+
+        return trophy.getSizes().stream()
+                .filter(variant -> variant.getSize().equalsIgnoreCase(size))
+                .findFirst()
+                .map(SizeVariantDamage::getImage)
+                .orElseThrow(() -> new RuntimeException("Image not found for size: " + size));
+    }
+
+
+    // Service
+    public SizeVariantDamage getSizeByTrophyCodeAndSize(String trophyCode, String size) {
+        Optional<DamagedTrophy> optionalTrophy = damagedTrophyRepository.findByTrophyCode(trophyCode);
+        if (optionalTrophy.isPresent()) {
+            return optionalTrophy.get().getSizes().stream()
+                    .filter(s -> s.getSize().equals(size))
+                    .findFirst()
+                    .orElse(null);
+        }
+        return null;
+    }
+
 }
