@@ -1,25 +1,23 @@
-// src/services/TrophyService.js
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8080/api/rajetrophy";
+const BASE_URL = "http://localhost:8080/api/trophies";
 
 const TrophyService = {
-  createTrophy: (data) => axios.post(`${BASE_URL}/add`, data),
+  createTrophy: (formData) =>
+    axios.post(`${BASE_URL}/create`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 
-  getAllTrophies: () => axios.get(`${BASE_URL}/all`),
+  getAllTrophies: () => axios.get(`${BASE_URL}`),
 
-  getTrophyById: (id) => axios.get(`${BASE_URL}/${id}`),
+  getTrophyByCode: (trophyCode) => axios.get(`${BASE_URL}/${trophyCode}`),
 
-  updateTrophy: (id, data) => axios.put(`${BASE_URL}/${id}`, data),
+  updateTrophyByCodeAndSize: (trophyCode, size, formData) =>
+    axios.put(`${BASE_URL}/${trophyCode}/size/${size}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 
   deleteTrophy: (id) => axios.delete(`${BASE_URL}/${id}`),
+};
 
-  getTrophyByCode: (trophyCode, size) => axios.get(`${BASE_URL}/find/${trophyCode}/size/${size}`),
-
-  updateTrophyByCodeAndSize: (trophyCode, size, data) =>
-    axios.put(
-      `${BASE_URL}/update/${encodeURIComponent(trophyCode)}/size/${size}`,
-      data
-    ),
-  }
 export default TrophyService;

@@ -1,6 +1,9 @@
 package com.trophy.Trophy;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import java.util.Optional;
 
-public abstract class TrophyRepository implements JpaRepository {
+public interface TrophyRepository extends MongoRepository<Trophy, String> {
+    Optional<Trophy> findByTrophyCode(String trophyCode);
+    void deleteByTrophyCode(String trophyCode);
 }
