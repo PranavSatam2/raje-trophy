@@ -1,56 +1,58 @@
-package com.trophy.Trophy;
+package com.trophy.Trophy.SoldTrophy;
 
-import org.springframework.web.multipart.MultipartFile;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-public class SizeVariant {
+@Getter
+@Setter
+@Document(collection = "sold_trophies")
+public class SoldTrophy {
 
+    @Id
+    private String id;
+
+    private String trophyCode;
     private String size;
-    private double price;
-    private String description;
-    private int quantity;
     private String colour;
     private String location;
     private String soldDate;
     private Double soldPrice;
-    private String doe;
-    private Integer soldQuantity;     // new
+    private Integer soldQuantity;
     private Double soldCurrentQuantityPrice;
-
-    // Image will be stored as byte[] in MongoDB
     private byte[] image;
+
+    // getters & setters
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTrophyCode() {
+        return trophyCode;
+    }
+
+    public void setTrophyCode(String trophyCode) {
+        this.trophyCode = trophyCode;
+    }
 
     public String getSize() {
         return size;
     }
+
     public void setSize(String size) {
         this.size = size;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public String getColour() {
         return colour;
     }
+
     public void setColour(String colour) {
         this.colour = colour;
     }
@@ -58,6 +60,7 @@ public class SizeVariant {
     public String getLocation() {
         return location;
     }
+
     public void setLocation(String location) {
         this.location = location;
     }
@@ -65,6 +68,7 @@ public class SizeVariant {
     public String getSoldDate() {
         return soldDate;
     }
+
     public void setSoldDate(String soldDate) {
         this.soldDate = soldDate;
     }
@@ -72,23 +76,9 @@ public class SizeVariant {
     public Double getSoldPrice() {
         return soldPrice;
     }
+
     public void setSoldPrice(Double soldPrice) {
         this.soldPrice = soldPrice;
-    }
-
-    public byte[] getImage() {
-        return image;
-    }
-    public void setImage(byte[] image) {
-        this.image = image;
-    }
-
-    public String getDoe() {
-        return doe;
-    }
-
-    public void setDoe(String doe) {
-        this.doe = doe;
     }
 
     public Integer getSoldQuantity() {
@@ -105,5 +95,13 @@ public class SizeVariant {
 
     public void setSoldCurrentQuantityPrice(Double soldCurrentQuantityPrice) {
         this.soldCurrentQuantityPrice = soldCurrentQuantityPrice;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }
