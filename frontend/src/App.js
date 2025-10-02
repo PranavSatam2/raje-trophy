@@ -15,7 +15,7 @@ import DamageTrophy from "./pages/DamageTrophy";
 import ViewDamageTrophy from "./pages/ViewDamageTrophy";
 import EditDamageTrophy from "./pages/EditDamageTrophy";
 import ViewSoldTrophies from "./pages/ViewSoldTrophies";
-
+import ViewAllSoldTrophies from "./pages/ViewAllSoldTrophies";
 function App() {
   return (
     <Router>
@@ -38,6 +38,7 @@ function App() {
           <Route path="view-damage-trophy" element={<ViewDamageTrophy />} />
           <Route path="editdamagetrophy/:trophyCode/:size" element={<EditDamageTrophy />} />
           <Route path="view-sold-trophies" element={<ViewSoldTrophies />} />
+          <Route path="view-all-sold-trophies" element={<ViewAllSoldTrophies />} />
         </Route>
       </Routes>
 
