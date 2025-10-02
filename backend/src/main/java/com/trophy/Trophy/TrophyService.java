@@ -1,5 +1,7 @@
 package com.trophy.Trophy;
 
+import com.trophy.Trophy.SoldTrophy.SoldTrophy;
+import com.trophy.Trophy.SoldTrophy.SoldTrophyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,8 +14,11 @@ public class TrophyService {
 
     private final TrophyRepository trophyRepository;
 
-    public TrophyService(TrophyRepository trophyRepository) {
+    private final SoldTrophyRepository soldTrophyRepository;
+
+    public TrophyService(TrophyRepository trophyRepository, SoldTrophyRepository soldTrophyRepository) {
         this.trophyRepository = trophyRepository;
+        this.soldTrophyRepository = soldTrophyRepository;
     }
 
     // Create or Add SizeVariant to Trophy
@@ -69,42 +74,57 @@ public class TrophyService {
         return trophyRepository.findByTrophyCode(trophyCode);
     }
 
-    public Trophy updateSizeVariant(String trophyCode, String size, SizeVariant updatedSize, MultipartFile imageFile) throws IOException {
+    public Trophy updateAndSellTrophy(String trophyCode, String size, SizeVariant updatedSize, MultipartFile imageFile) throws IOException {
         Optional<Trophy> optionalTrophy = trophyRepository.findByTrophyCode(trophyCode);
 
         if (optionalTrophy.isPresent()) {
             Trophy trophy = optionalTrophy.get();
 
-            // Find existing size
             SizeVariant existingSize = trophy.getSizes()
                     .stream()
                     .filter(s -> s.getSize().equals(size))
                     .findFirst()
-                    .orElse(null);
+                    .orElseThrow(() -> new RuntimeException("Size not found"));
 
-            if (existingSize == null) {
-                throw new RuntimeException("Size " + size + " not found for TrophyCode " + trophyCode);
-            }
+            // calculate new quantity
+            int soldQuantity = updatedSize.getSoldQuantity() != null ? updatedSize.getSoldQuantity() : 0;
+            int newQuantity = existingSize.getQuantity() - soldQuantity;
+            if (newQuantity < 0) throw new RuntimeException("Sold quantity exceeds available quantity");
 
-            // Update only changed fields
-            existingSize.setPrice(updatedSize.getPrice());
-            existingSize.setQuantity(updatedSize.getQuantity());
-            existingSize.setColour(updatedSize.getColour());
-            existingSize.setLocation(updatedSize.getLocation());
+            existingSize.setQuantity(newQuantity);
             existingSize.setSoldDate(updatedSize.getSoldDate());
             existingSize.setSoldPrice(updatedSize.getSoldPrice());
+            existingSize.setSoldQuantity(soldQuantity);
+            existingSize.setSoldCurrentQuantityPrice(updatedSize.getSoldCurrentQuantityPrice());
+            existingSize.setColour(updatedSize.getColour());
+            existingSize.setLocation(updatedSize.getLocation());
+            existingSize.setPrice(updatedSize.getPrice());
             existingSize.setDoe(updatedSize.getDoe());
 
-            // Replace image only if a new one is provided
             if (imageFile != null && !imageFile.isEmpty()) {
                 existingSize.setImage(imageFile.getBytes());
             }
+
+            // ✅ Save sold record separately
+            SoldTrophy soldTrophy = new SoldTrophy();
+            soldTrophy.setTrophyCode(trophyCode);
+            soldTrophy.setSize(size);
+            soldTrophy.setColour(existingSize.getColour());
+            soldTrophy.setLocation(existingSize.getLocation());
+            soldTrophy.setSoldDate(updatedSize.getSoldDate());
+            soldTrophy.setSoldPrice(updatedSize.getSoldPrice());
+            soldTrophy.setSoldQuantity(soldQuantity);
+            soldTrophy.setSoldCurrentQuantityPrice(updatedSize.getSoldCurrentQuantityPrice());
+            soldTrophy.setImage(existingSize.getImage());
+
+            soldTrophyRepository.save(soldTrophy);
 
             return trophyRepository.save(trophy);
         }
 
         throw new RuntimeException("Trophy with code " + trophyCode + " not found");
     }
+
 
     // Delete entire trophy
     public void deleteTrophy(String trophyCode) {

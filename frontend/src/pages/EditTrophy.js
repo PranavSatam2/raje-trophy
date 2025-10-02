@@ -14,9 +14,12 @@ const EditTrophy = () => {
     size: size || "",
     soldDate: "",
     soldPrice: "",
-    image: null, // file
-    imagePreview: "" // preview
+    soldQuantity: "", // ➕ add
+    soldCurrentQuantityPrice: "", // ➕ add
+    image: null,
+    imagePreview: ""
   });
+
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,41 +32,48 @@ const EditTrophy = () => {
   };
 
   useEffect(() => {
-  TrophyService.getTrophyByCode(trophyCode, size)
-    .then((res) => {
-      console.log("API Response:", res.data);
-      const trophy = res.data;
+    TrophyService.getTrophyByCode(trophyCode, size)
+      .then((res) => {
+        console.log("API Response:", res.data);
+        const trophy = res.data;
 
-      // Find the size variant that matches the requested size
-      const variant = trophy.sizes?.find((s) => s.size === size);
+        // Find the size variant that matches the requested size
+        const variant = trophy.sizes?.find((s) => s.size === size);
 
-      if (variant) {
-        setFormData({
-          colour: variant.colour || "",
-          doe: variant.doe,
-          location: variant.location || "",
-          price: variant.price || "",
-          quantity: variant.quantity || "",
-          size: variant.size || "",
-          soldDate: formatDateForInput(variant.soldDate),
-          soldPrice: variant.soldPrice || "",
-          image: null,
-          imagePreview: variant.image
-            ? `data:image/jpeg;base64,${variant.image}`
-            : ""
-        });
-      } else {
-        setError(`No variant found for size: ${size}`);
-      }
+        if (variant) {
+          setFormData({
+            colour: variant.colour || "",
+            doe: variant.doe,
+            location: variant.location || "",
+            price: variant.price || "",
+            quantity: variant.quantity || "",
+            size: variant.size || "",
+            soldDate: formatDateForInput(variant.soldDate),
+            soldPrice: variant.soldPrice || "",
+            image: null,
+            imagePreview: variant.image
+              ? `data:image/jpeg;base64,${variant.image}`
+              : ""
+          });
+        } else {
+          setError(`No variant found for size: ${size}`);
+        }
 
-      setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Error fetching trophy", err);
-      setError("Failed to load trophy");
-      setLoading(false);
-    });
-}, [trophyCode, size]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching trophy", err);
+        setError("Failed to load trophy");
+        setLoading(false);
+      });
+  }, [trophyCode, size]);
+
+  useEffect(() => {
+    if (formData.soldQuantity && formData.soldPrice) {
+      const total = parseInt(formData.soldQuantity) * parseFloat(formData.soldPrice);
+      setFormData((prev) => ({ ...prev, soldCurrentQuantityPrice: total }));
+    }
+  }, [formData.soldQuantity, formData.soldPrice]);
 
 
 
@@ -85,16 +95,19 @@ const EditTrophy = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // ✅ Build FormData for API
     const form = new FormData();
     form.append("price", formData.price);
     form.append("quantity", formData.quantity);
     form.append("colour", formData.colour);
     form.append("location", formData.location);
+    form.append("doe", formData.doe);
+
+    // ➕ sold fields
     form.append("soldDate", formData.soldDate);
     form.append("soldPrice", formData.soldPrice);
-    form.append("doe", formData.doe);
+    form.append("soldQuantity", formData.soldQuantity);
+    form.append("soldCurrentQuantityPrice", formData.soldCurrentQuantityPrice);
+
     if (formData.image) {
       form.append("imageFile", formData.image);
     }
@@ -131,6 +144,7 @@ const EditTrophy = () => {
               name="price"
               value={formData.price}
               onChange={handleChange}
+              disabled
               className="form-control"
               required
             />
@@ -143,6 +157,7 @@ const EditTrophy = () => {
               name="quantity"
               value={formData.quantity}
               onChange={handleChange}
+              disabled
               className="form-control"
               required
             />
@@ -223,6 +238,30 @@ const EditTrophy = () => {
               className="form-control"
             />
           </div>
+
+          <div className="col-md-5 mb-2">
+            <label>Sold Quantity</label>
+            <input
+              type="number"
+              name="soldQuantity"
+              value={formData.soldQuantity}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+
+          <div className="col-md-5 mb-4">
+            <label>Sold Total Price</label>
+            <input
+              type="number"
+              name="soldCurrentQuantityPrice"
+              value={formData.soldCurrentQuantityPrice}
+              onChange={handleChange}
+              disabled
+              className="form-control"
+            />
+          </div>
+
         </div>
 
         <button type="submit" className="btn btn-primary">Update</button>
