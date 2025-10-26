@@ -26,6 +26,12 @@ function AdminDashboard() {
           <li className="nav-item">
             <Link to="view-all-sold-trophies" className="nav-link text-white">View All Sale Trophy</Link>
           </li>
+          <li className="nav-item">
+            <Link to="add-payment" className="nav-link text-white">Add Payment</Link>
+          </li>
+          <li className="nav-item">
+            <Link to="view-payments" className="nav-link text-white">View Payment Info</Link>
+          </li>
         </ul>
       </div>
 
