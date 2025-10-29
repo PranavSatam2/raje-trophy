@@ -1,5 +1,7 @@
 package com.trophy.Trophy.DamagedTrophy;
 
+import com.trophy.Trophy.Trophy;
+import com.trophy.Trophy.TrophyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,9 +13,12 @@ import java.util.Optional;
 public class DamagedTrophyService {
 
     private final DamagedTrophyRepository damagedTrophyRepository;
+    private final TrophyRepository trophyRepository;
 
-    public DamagedTrophyService(DamagedTrophyRepository damagedTrophyRepository) {
+    public DamagedTrophyService(DamagedTrophyRepository damagedTrophyRepository,
+                                TrophyRepository trophyRepository) {
         this.damagedTrophyRepository = damagedTrophyRepository;
+        this.trophyRepository = trophyRepository;
     }
 
     // Create or Add SizeVariant to Trophy
@@ -38,6 +43,7 @@ public class DamagedTrophyService {
         }
     }
 
+    // Add multiple sizes + reduce quantity from main Trophy
     public DamagedTrophy addMultipleSizes(String trophyCode, List<SizeVariantDamage> sizeVariants, List<MultipartFile> imageFiles) throws IOException {
         DamagedTrophy trophy = damagedTrophyRepository.findByTrophyCode(trophyCode).orElse(new DamagedTrophy());
         trophy.setTrophyCode(trophyCode);
@@ -45,6 +51,7 @@ public class DamagedTrophyService {
         for (int i = 0; i < sizeVariants.size(); i++) {
             SizeVariantDamage variant = sizeVariants.get(i);
 
+            // Handle image upload
             if (imageFiles != null && imageFiles.size() > i) {
                 MultipartFile imageFile = imageFiles.get(i);
                 if (imageFile != null && !imageFile.isEmpty()) {
@@ -53,6 +60,28 @@ public class DamagedTrophyService {
             }
 
             trophy.getSizes().add(variant);
+
+            // 🔽 Reduce stock from main Trophy if present
+            Optional<Trophy> optionalMainTrophy = trophyRepository.findByTrophyCode(trophyCode);
+            if (optionalMainTrophy.isPresent()) {
+                Trophy mainTrophy = optionalMainTrophy.get();
+
+                // Find matching size variant
+                mainTrophy.getSizes().stream()
+                        .filter(s -> s.getSize().equalsIgnoreCase(variant.getSize()))
+                        .findFirst()
+                        .ifPresent(sizeVariant -> {
+                            if (sizeVariant.getQuantity() < variant.getQuantity()) {
+                                throw new RuntimeException("Not enough stock to mark as damaged!");
+                            }
+
+                            int currentQty = sizeVariant.getQuantity();
+                            int newQty = currentQty - variant.getQuantity();
+                            sizeVariant.setQuantity(Math.max(newQty, 0)); // prevent negative quantity
+                        });
+
+                trophyRepository.save(mainTrophy);
+            }
         }
 
         return damagedTrophyRepository.save(trophy);
