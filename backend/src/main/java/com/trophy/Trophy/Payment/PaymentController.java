@@ -10,7 +10,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/payments")
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 public class PaymentController {
 
     @Autowired
