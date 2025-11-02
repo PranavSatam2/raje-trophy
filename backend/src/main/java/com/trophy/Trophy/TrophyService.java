@@ -133,14 +133,21 @@ public class TrophyService {
 
     // Delete a specific size
     public Trophy deleteSizeVariant(String trophyCode, String size) {
-        Optional<Trophy> optionalTrophy = trophyRepository.findByTrophyCode(trophyCode);
-        if (optionalTrophy.isPresent()) {
-            Trophy trophy = optionalTrophy.get();
-            trophy.getSizes().removeIf(s -> s.getSize().equals(size));
-            return trophyRepository.save(trophy);
+        Trophy trophy = trophyRepository.findByTrophyCode(trophyCode)
+                .orElseThrow(() -> new RuntimeException("Trophy not found"));
+
+        // Remove that size
+        trophy.getSizes().removeIf(s -> String.valueOf(s.getSize()).equals(size));
+
+        // If no sizes left, delete trophy completely
+        if (trophy.getSizes().isEmpty()) {
+            trophyRepository.delete(trophy);
+            return null; // Return null so controller knows trophy is fully deleted
         }
-        return null;
+
+        return trophyRepository.save(trophy);
     }
+
 
     // Get image for a specific trophyCode and size
     public byte[] getImageByTrophyCodeAndSize(String trophyCode, String size) {

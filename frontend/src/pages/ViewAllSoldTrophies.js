@@ -35,7 +35,7 @@ useEffect(() => {
       if (err.response?.status === 403) {
         alert("Session expired. Please login again.");
         localStorage.removeItem("token");
-        window.location.href = "/login"; // move to your login page
+        window.location.href = "/admin"; // move to your login page
       }
 
       setError("Failed to load sold trophies");

@@ -33,10 +33,11 @@ const TrophyService = {
       }
     ),
 
-  deleteTrophy: (id) =>
-    axios.delete(`${BASE_URL}/${id}`, {
-      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
-    }),
+  deleteTrophy: (trophyCode, size) =>
+  axios.delete(`${BASE_URL}/${encodeURIComponent(trophyCode)}/size/${size}`, {
+    headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+  }),
+
 };
 
 export default TrophyService;
