@@ -13,21 +13,36 @@ const ViewAllSoldTrophies = () => {
   const API_URL = "http://localhost:8080/sold-trophies";
 
   // Fetch all sold trophies
-  useEffect(() => {
-    axios
-      .get(API_URL)
-      .then((res) => {
-        const data = res.data || [];
-        setSoldTrophies(data);
-        setFilteredTrophies(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching sold trophies:", err);
-        setError("Failed to load sold trophies");
-        setLoading(false);
-      });
-  }, []);
+  // Fetch all sold trophies
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  axios
+    .get(API_URL, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    .then((res) => {
+      const data = res.data || [];
+      setSoldTrophies(data);
+      setFilteredTrophies(data);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.error("Error fetching sold trophies:", err);
+
+      if (err.response?.status === 403) {
+        alert("Session expired. Please login again.");
+        localStorage.removeItem("token");
+        window.location.href = "/login"; // move to your login page
+      }
+
+      setError("Failed to load sold trophies");
+      setLoading(false);
+    });
+}, []);
+
 
   // Filter by trophy code
   useEffect(() => {
@@ -40,30 +55,31 @@ const ViewAllSoldTrophies = () => {
 
 
   const handleExport = () => {
-    // if (selectedTrophies.length === 0) {
-    //   alert("Please select at least one record to export.");
-    //   return;
-    // }
+  const token = localStorage.getItem("token");
 
-    axios
-      .post(
-        "http://localhost:8080/api/trophies/export-sold-trophies",
-        {},
-        { responseType: "blob" }
-      )
-      .then((res) => {
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "All_sold_trophies.xlsx");
-        document.body.appendChild(link);
-        link.click();
-      })
-      .catch((err) => {
-        console.error("Error exporting Excel:", err);
-        alert("Failed to export Excel");
-      });
-  };
+  axios
+    .post(
+      "http://localhost:8080/api/trophies/export-sold-trophies",
+      {},
+      {
+        responseType: "blob",
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    )
+    .then((res) => {
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "All_sold_trophies.xlsx");
+      document.body.appendChild(link);
+      link.click();
+    })
+    .catch((err) => {
+      console.error("Error exporting Excel:", err);
+      alert("Failed to export Excel");
+    });
+};
+
 
   // Pagination
   const indexOfLast = currentPage * rowsPerPage;
