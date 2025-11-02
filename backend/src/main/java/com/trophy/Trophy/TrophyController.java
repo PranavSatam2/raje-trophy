@@ -124,10 +124,16 @@ public class TrophyController {
 
     // DELETE size variant
     @DeleteMapping("/{trophyCode}/size/{size}")
-    public ResponseEntity<Trophy> deleteSizeVariant(@PathVariable String trophyCode, @PathVariable String size) {
-        Trophy updatedTrophy = trophyService.deleteSizeVariant(trophyCode, size);
-        return ResponseEntity.ok(updatedTrophy);
+    public ResponseEntity<?> deleteSizeVariant(@PathVariable String trophyCode, @PathVariable String size) {
+        Trophy updated = trophyService.deleteSizeVariant(trophyCode, size);
+
+        if (updated == null) {
+            return ResponseEntity.ok("Trophy deleted because all sizes were removed");
+        }
+
+        return ResponseEntity.ok(updated);
     }
+
 
     @GetMapping("/{trophyCode}/size/{size}/image")
     public ResponseEntity<byte[]> getTrophyImage(

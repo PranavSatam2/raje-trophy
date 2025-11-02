@@ -125,10 +125,19 @@ function ViewTrophy() {
                 {userRole === "ADMIN" && (
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => TrophyService.deleteTrophy(row.id)
-                      .then(() => window.location.reload())
-                      .catch(err => console.error("Delete failed", err))
-                    }
+                    onClick={() => {
+                      if (window.confirm(`Delete size ${row.size} for trophy ${row.trophyCode}?`)) {
+                        TrophyService.deleteTrophy(row.trophyCode, row.size)
+                          .then((res) => {
+                            alert(res.data || "Deleted Successfully");
+                            window.location.reload();
+                          })
+                          .catch((err) => {
+                            console.error("Delete failed", err);
+                            alert("Failed to delete");
+                          });
+                      }
+                    }}
                   >
                     Delete
                   </button>
