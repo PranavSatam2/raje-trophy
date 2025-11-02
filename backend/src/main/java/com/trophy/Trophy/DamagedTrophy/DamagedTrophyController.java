@@ -15,7 +15,7 @@ import java.util.Optional;
 @RestController // Marks this class as a REST API controller
 @RequestMapping("/api/damage-trophies") // Base URL for all endpoints in this controller
 @CrossOrigin(origins = "*") // Allow CORS from any origin (React frontend)
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 public class DamagedTrophyController {
 
     private final DamagedTrophyService damagedTrophyService;

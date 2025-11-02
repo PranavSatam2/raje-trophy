@@ -49,6 +49,8 @@ function ViewTrophy() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentRows = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+  const userRole = localStorage.getItem("role");
+
 
   useEffect(() => {
     setCurrentPage(1);
@@ -114,11 +116,25 @@ function ViewTrophy() {
               <td>
                 <Link
                   to={`/admin/dashboard/edit/${row.trophyCode}/${row.size}`}
-                  className="btn btn-warning btn-sm"
+                  className="btn btn-warning btn-sm me-2"
                 >
                   Edit
                 </Link>
+
+                {/* Show delete button only if role = ADMIN */}
+                {userRole === "ADMIN" && (
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => TrophyService.deleteTrophy(row.id)
+                      .then(() => window.location.reload())
+                      .catch(err => console.error("Delete failed", err))
+                    }
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
+
             </tr>
           ))}
           {currentRows.length === 0 && (
