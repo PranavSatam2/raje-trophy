@@ -30,10 +30,11 @@
 
 .sheet-table th,
 .sheet-table td {
-  padding: 10px 14px;
+  padding: 4px 8px;
   border: 1px solid #e2e8f0;
   text-align: left;
   font-size: 0.9rem;
+  line-height: 1.15rem;
 }
 
 .sheet-table th {
@@ -46,10 +47,11 @@
 .sheet-table input {
   width: 100%;
   border: none;
-  padding: 8px;
+  padding: 4px;
   background: transparent;
   outline: none;
   font-size: 0.9rem;
+  line-height: 0.85rem;
 }
 
 .sheet-table input:focus {

@@ -85,7 +85,7 @@ function ViewDamageTrophy() {
             <th>Date of Entry</th>
             <th>Damage Remark</th>
             <th>Image</th>
-            <th>Action</th>
+            {/* <th>Action</th> */}
           </tr>
         </thead>
         <tbody>
@@ -112,13 +112,13 @@ function ViewDamageTrophy() {
                   "N/A"
                 )}
               </td>
-              <td>
+              {/* <td>
                 <Link
                   to={`/admin/dashboard/editdamagetrophy/${row.trophyCode}/${row.size}`}
                 >
                   <button className="btn btn-warning btn-sm">Edit</button>
                 </Link>
-              </td>
+              </td> */}
             </tr>
           ))}
           {currentRows.length === 0 && (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+// import api from "../services/axiosInstance";  // ✅ Uses JWT axios instancea
 import "./PaymentSheet.css";
 
 function PaymentSheet() {
@@ -11,8 +12,8 @@ function PaymentSheet() {
   const [savingIndex, setSavingIndex] = useState(null);
   const rowsPerPage = 10;
 
-  const saveTimers = useRef({}); // to track debounce timers
-  const API_URL = "http://localhost:8080/api/payments";
+  const saveTimers = useRef({});
+  const API_URL = "http://localhost:8080/api/payments"; // ✅ Uses base from axiosInstance
 
   useEffect(() => {
     fetchPayments();
@@ -20,18 +21,22 @@ function PaymentSheet() {
 
   const fetchPayments = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+
+
       const data = res.data || [];
       setPayments(data);
       setFilteredPayments(data);
     } catch (err) {
-      alert("Error loading payments");
+      console.error("Error loading payments", err);
+      alert("Session expired or unauthorized. Please login again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔍 Search filter logic
   useEffect(() => {
     const filtered = payments.filter((p) => {
       const query = searchTerm.toLowerCase();
@@ -43,17 +48,16 @@ function PaymentSheet() {
         p.paymentAmount?.toString().toLowerCase().includes(query)
       );
     });
+
     setFilteredPayments(filtered);
     setCurrentPage(1);
   }, [searchTerm, payments]);
 
-  // ✅ Handle cell change
   const handleChange = (index, field, value) => {
     const updated = [...filteredPayments];
     updated[index][field] = value;
     setFilteredPayments(updated);
 
-    // sync back to global state
     const globalIndex = payments.findIndex((p) => p.id === updated[index].id);
     if (globalIndex !== -1) {
       const updatedAll = [...payments];
@@ -61,18 +65,15 @@ function PaymentSheet() {
       setPayments(updatedAll);
     }
 
-    // debounce auto-save
     triggerAutoSave(index);
   };
 
-  // ✅ Debounced auto-save
   const triggerAutoSave = (index) => {
     clearTimeout(saveTimers.current[index]);
 
     saveTimers.current[index] = setTimeout(() => {
       const payment = filteredPayments[index];
 
-      // ensure all required fields are filled before saving
       const isRowComplete = [
         "paymentDate",
         "paymentAmount",
@@ -82,10 +83,9 @@ function PaymentSheet() {
         "paymentMethod",
       ].every((field) => payment[field] && payment[field].toString().trim() !== "");
 
-      if (!isRowComplete) return; // don’t save incomplete rows
-
+      if (!isRowComplete) return;
       handleAutoSave(index);
-    }, 2000); // wait 2 seconds of inactivity
+    }, 2000);
   };
 
   const handleAutoSave = async (index) => {
@@ -95,9 +95,17 @@ function PaymentSheet() {
     setSavingIndex(index);
     try {
       if (payment.id) {
-        await axios.put(`${API_URL}/${payment.id}`, payment);
+        await axios.put(`${API_URL}/${payment.id}`, payment, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+
+
       } else {
-        const res = await axios.post(API_URL, payment);
+        const res = await axios.post(API_URL, payment, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        });
+
+
         const updated = [...filteredPayments];
         updated[index] = res.data;
         setFilteredPayments(updated);
@@ -124,15 +132,18 @@ function PaymentSheet() {
 
   const handleDelete = async (id, index) => {
     try {
-      if (id) await axios.delete(`${API_URL}/${id}`);
+      if (id) await axios.delete(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      });
+
+
       setPayments((prev) => prev.filter((p) => p.id !== id));
       setFilteredPayments((prev) => prev.filter((_, i) => i !== index));
-    } catch {
+    } catch (err) {
       alert("Error deleting record");
     }
   };
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredPayments.length / rowsPerPage);
   const indexOfLast = currentPage * rowsPerPage;
   const indexOfFirst = indexOfLast - rowsPerPage;
@@ -181,54 +192,42 @@ function PaymentSheet() {
                     <input
                       type="date"
                       value={p.paymentDate || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "paymentDate", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "paymentDate", e.target.value)}
                     />
                   </td>
                   <td>
                     <input
                       type="number"
                       value={p.paymentAmount || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "paymentAmount", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "paymentAmount", e.target.value)}
                     />
                   </td>
                   <td>
                     <input
                       type="text"
                       value={p.transactionId || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "transactionId", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "transactionId", e.target.value)}
                     />
                   </td>
                   <td>
                     <input
                       type="text"
                       value={p.paymentDoneBy || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "paymentDoneBy", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "paymentDoneBy", e.target.value)}
                     />
                   </td>
                   <td>
                     <input
                       type="text"
                       value={p.paymentWho || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "paymentWho", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "paymentWho", e.target.value)}
                     />
                   </td>
                   <td>
                     <input
                       type="text"
                       value={p.paymentMethod || ""}
-                      onChange={(e) =>
-                        handleChange(globalIndex, "paymentMethod", e.target.value)
-                      }
+                      onChange={(e) => handleChange(globalIndex, "paymentMethod", e.target.value)}
                     />
                   </td>
                   <td>
@@ -251,9 +250,7 @@ function PaymentSheet() {
         <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
           ⬅ Prev
         </button>
-        <span>
-          Page {currentPage} of {totalPages || 1}
-        </span>
+        <span>Page {currentPage} of {totalPages || 1}</span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages || totalPages === 0}
