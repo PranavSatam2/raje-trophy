@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/sold-trophies")
 @CrossOrigin(origins = "http://localhost:3000")
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 public class SoldTrophyController {
 
     @Autowired
