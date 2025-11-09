@@ -84,6 +84,7 @@ function ViewTrophy() {
             <th>Date</th>
             <th>Sold Date</th>
             <th>Sold Price</th>
+            <th>Sale Price</th>
             <th>Image</th>
             <th>Action</th>
           </tr>
@@ -100,6 +101,7 @@ function ViewTrophy() {
               <td>{row.doe ? row.doe.split("T")[0] : ""}</td>
               <td>{row.soldDate ? row.soldDate.split("T")[0] : ""}</td>
               <td>₹{row.soldPrice}</td>
+              <td>₹{row.salePrice}</td>
               <td>
                 {row.image ? (
                   <img
