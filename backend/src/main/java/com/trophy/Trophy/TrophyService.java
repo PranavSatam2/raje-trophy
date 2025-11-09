@@ -100,6 +100,7 @@ public class TrophyService {
             existingSize.setLocation(updatedSize.getLocation());
             existingSize.setPrice(updatedSize.getPrice());
             existingSize.setDoe(updatedSize.getDoe());
+            existingSize.setSalePrice(updatedSize.getSalePrice());
 
             if (imageFile != null && !imageFile.isEmpty()) {
                 existingSize.setImage(imageFile.getBytes());

@@ -90,6 +90,7 @@ public class TrophyController {
             @RequestParam String doe,
             @RequestParam(required = false) String soldDate,
             @RequestParam(required = false) Double soldPrice,
+            @RequestParam(required = false) String salePrice,
             @RequestPart(required = false) MultipartFile imageFile
     ) throws IOException {
         SizeVariant updatedSize = new SizeVariant();
@@ -104,6 +105,7 @@ public class TrophyController {
 
         updatedSize.setSoldDate(soldDate);
         updatedSize.setSoldPrice(soldPrice);
+        updatedSize.setSalePrice(salePrice);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             updatedSize.setImage(imageFile.getBytes());
@@ -159,6 +161,7 @@ public class TrophyController {
             @RequestParam Double soldPrice,
             @RequestParam Integer soldQuantity,
             @RequestParam Double soldCurrentQuantityPrice,
+            @RequestParam String salePrice,
             @RequestPart(required = false) MultipartFile imageFile
     ) throws IOException {
         SizeVariant updatedSize = new SizeVariant();
@@ -172,6 +175,7 @@ public class TrophyController {
         updatedSize.setSoldPrice(soldPrice);
         updatedSize.setSoldQuantity(soldQuantity);
         updatedSize.setSoldCurrentQuantityPrice(soldCurrentQuantityPrice);
+        updatedSize.setSalePrice(salePrice);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             updatedSize.setImage(imageFile.getBytes());
