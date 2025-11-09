@@ -1,11 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
 
-const BASE_URL_LOGIN = "http://localhost:8080/api";
+const API_URL = "http://localhost:8080/auth/login";
 
-const LoginService = {
-  login: (data) => {
-    return axios.post(`${BASE_URL_LOGIN}/login`, data);
-  },
+const login = async (username, password) => {
+  const response = await axios.post(API_URL, { username, password });
+  return response.data; // {token, role}
 };
 
-export default LoginService;
+export default { login };

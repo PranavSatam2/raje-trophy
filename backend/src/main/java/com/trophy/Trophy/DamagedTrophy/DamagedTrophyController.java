@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RestController // Marks this class as a REST API controller
 @RequestMapping("/api/damage-trophies") // Base URL for all endpoints in this controller
 @CrossOrigin(origins = "*") // Allow CORS from any origin (React frontend)
+//@PreAuthorize("hasRole('ADMIN')")
 public class DamagedTrophyController {
 
     private final DamagedTrophyService damagedTrophyService;

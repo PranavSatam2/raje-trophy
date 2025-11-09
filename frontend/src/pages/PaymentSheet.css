@@ -1,0 +1,157 @@
+.sheet-container {
+  max-width: 95%;
+  margin: 30px auto;
+  font-family: "Poppins", sans-serif;
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.sheet-title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sheet-table th,
+.sheet-table td {
+  padding: 4px 8px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.15rem;
+}
+
+.sheet-table th {
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.sheet-table input {
+  width: 100%;
+  border: none;
+  padding: 4px;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  line-height: 0.85rem;
+}
+
+.sheet-table input:focus {
+  background: #eef2ff;
+  border-radius: 4px;
+}
+
+.delete-row {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-row:hover {
+  background: #b91c1c;
+}
+
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.add-btn,
+.save-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.add-btn {
+  background: #22c55e;
+}
+
+.add-btn:hover {
+  background: #16a34a;
+}
+
+.save-btn {
+  background: #2563eb;
+}
+
+.save-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 15px;
+}
+
+.pagination button {
+  border: none;
+  background: #e5e7eb;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.pagination button.active {
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+}
+
+.pagination button:hover:not(.active) {
+  background: #d1d5db;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 100px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.search-bar {
+  margin-bottom: 15px;
+  text-align: left;
+}

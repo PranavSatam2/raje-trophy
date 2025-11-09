@@ -20,18 +20,18 @@ function AdminDashboard() {
           <li className="nav-item">
             <Link to="view-damage-trophy" className="nav-link text-white">View Damaged Trophy</Link>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link to="view-sold-trophies" className="nav-link text-white">View Sale Trophy</Link>
-          </li>
+          </li> */}
           <li className="nav-item">
             <Link to="view-all-sold-trophies" className="nav-link text-white">View All Sale Trophy</Link>
           </li>
           <li className="nav-item">
             <Link to="add-payment" className="nav-link text-white">Add Payment</Link>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link to="view-payments" className="nav-link text-white">View Payment Info</Link>
-          </li>
+          </li> */}
         </ul>
       </div>
 

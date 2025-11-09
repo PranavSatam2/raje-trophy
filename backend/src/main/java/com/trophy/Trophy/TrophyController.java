@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/trophies")
 @CrossOrigin(origins = "*")
+//@PreAuthorize("hasRole('ADMIN')")
 public class TrophyController {
 
     private final TrophyService trophyService;
@@ -88,6 +90,7 @@ public class TrophyController {
             @RequestParam String doe,
             @RequestParam(required = false) String soldDate,
             @RequestParam(required = false) Double soldPrice,
+            @RequestParam(required = false) String salePrice,
             @RequestPart(required = false) MultipartFile imageFile
     ) throws IOException {
         SizeVariant updatedSize = new SizeVariant();
@@ -102,6 +105,7 @@ public class TrophyController {
 
         updatedSize.setSoldDate(soldDate);
         updatedSize.setSoldPrice(soldPrice);
+        updatedSize.setSalePrice(salePrice);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             updatedSize.setImage(imageFile.getBytes());
@@ -122,10 +126,16 @@ public class TrophyController {
 
     // DELETE size variant
     @DeleteMapping("/{trophyCode}/size/{size}")
-    public ResponseEntity<Trophy> deleteSizeVariant(@PathVariable String trophyCode, @PathVariable String size) {
-        Trophy updatedTrophy = trophyService.deleteSizeVariant(trophyCode, size);
-        return ResponseEntity.ok(updatedTrophy);
+    public ResponseEntity<?> deleteSizeVariant(@PathVariable String trophyCode, @PathVariable String size) {
+        Trophy updated = trophyService.deleteSizeVariant(trophyCode, size);
+
+        if (updated == null) {
+            return ResponseEntity.ok("Trophy deleted because all sizes were removed");
+        }
+
+        return ResponseEntity.ok(updated);
     }
+
 
     @GetMapping("/{trophyCode}/size/{size}/image")
     public ResponseEntity<byte[]> getTrophyImage(
@@ -151,6 +161,7 @@ public class TrophyController {
             @RequestParam Double soldPrice,
             @RequestParam Integer soldQuantity,
             @RequestParam Double soldCurrentQuantityPrice,
+            @RequestParam String salePrice,
             @RequestPart(required = false) MultipartFile imageFile
     ) throws IOException {
         SizeVariant updatedSize = new SizeVariant();
@@ -164,6 +175,7 @@ public class TrophyController {
         updatedSize.setSoldPrice(soldPrice);
         updatedSize.setSoldQuantity(soldQuantity);
         updatedSize.setSoldCurrentQuantityPrice(soldCurrentQuantityPrice);
+        updatedSize.setSalePrice(salePrice);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             updatedSize.setImage(imageFile.getBytes());

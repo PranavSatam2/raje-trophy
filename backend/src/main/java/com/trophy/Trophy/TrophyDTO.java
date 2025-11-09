@@ -26,6 +26,7 @@ public class TrophyDTO {
         private String image;
         private Double soldPrice;
         private String soldDate;
+        private String salePrice;
 
 
         public void setSoldPrice(Double soldPrice) {
@@ -99,6 +100,14 @@ public class TrophyDTO {
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        public String getSalePrice() {
+            return salePrice;
+        }
+
+        public void setSalePrice(String salePrice) {
+            this.salePrice = salePrice;
         }
     }
 
