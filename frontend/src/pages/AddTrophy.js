@@ -16,6 +16,7 @@ function Trophy() {
         image: "",
         soldDate: "",
         soldPrice: "",
+        salePrice: "",
       },
     ],
   });
@@ -60,6 +61,7 @@ function Trophy() {
           image: "",
           soldDate: "",
           soldPrice: "",
+          salePrice: "",
         },
       ],
     });
@@ -105,6 +107,7 @@ function Trophy() {
           soldPrice: "",
           imageFile: null,
           imagePreview: null,
+          salePrice: "",
         },
       ],
     });
@@ -238,6 +241,19 @@ function Trophy() {
                     <span>No image</span>
                   )}
                 </div>
+              </div>
+
+              <div className="col-md-3 mb-2">
+                <label>Sale Price (₹)</label>
+                <input
+                  type="number"
+                  name="salePrice"
+                  className="form-control"
+                  value={entry.salePrice}
+                  onChange={(e) => handleSizeChange(index, e)}
+                  step="0.01"
+                  placeholder="Enter sold Price"
+                />
               </div>
 
               {/* <div className="col-md-3 mb-2">

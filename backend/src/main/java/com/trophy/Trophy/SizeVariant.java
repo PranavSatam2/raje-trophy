@@ -15,6 +15,7 @@ public class SizeVariant {
     private String doe;
     private Integer soldQuantity;     // new
     private Double soldCurrentQuantityPrice;
+    private String salePrice; // new
 
     // Image will be stored as byte[] in MongoDB
     private byte[] image;
@@ -105,5 +106,13 @@ public class SizeVariant {
 
     public void setSoldCurrentQuantityPrice(Double soldCurrentQuantityPrice) {
         this.soldCurrentQuantityPrice = soldCurrentQuantityPrice;
+    }
+
+    public String getSalePrice() {
+        return salePrice;
+    }
+
+    public void setSalePrice(String salePrice) {
+        this.salePrice = salePrice;
     }
 }

@@ -16,6 +16,7 @@ const EditTrophy = () => {
     soldPrice: "",
     soldQuantity: "", // ➕ add
     soldCurrentQuantityPrice: "", // ➕ add
+    salePrice: "", // ➕ add
     image: null,
     imagePreview: ""
   });
@@ -50,6 +51,7 @@ const EditTrophy = () => {
             size: variant.size || "",
             soldDate: formatDateForInput(variant.soldDate),
             soldPrice: variant.soldPrice || "",
+            salePrice: variant.salePrice || "", // ➕ add
             image: null,
             imagePreview: variant.image
               ? `data:image/jpeg;base64,${variant.image}`
@@ -105,6 +107,7 @@ const EditTrophy = () => {
     // ➕ sold fields
     form.append("soldDate", formData.soldDate);
     form.append("soldPrice", formData.soldPrice);
+    form.append("salePrice", formData.salePrice);
     form.append("soldQuantity", formData.soldQuantity);
     form.append("soldCurrentQuantityPrice", formData.soldCurrentQuantityPrice);
 
@@ -215,6 +218,18 @@ const EditTrophy = () => {
                 <span>No image</span>
               )}
             </div>
+          </div>
+
+          <div className="col-md-5 mb-2">
+            <label>Sale Price</label>
+            <input
+              type="number"
+              name="salePrice"
+              value={formData.salePrice}
+              onChange={handleChange}
+              className="form-control"
+              disabled
+            />
           </div>
 
           <div className="col-md-5 mb-2">
