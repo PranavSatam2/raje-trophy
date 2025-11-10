@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api"; 
+const API_BASE_URL = "http://15.206.219.199:8080/api"; 
 
 // Get token from local storage
 const authHeader = {
