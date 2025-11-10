@@ -13,7 +13,7 @@ function PaymentSheet() {
   const rowsPerPage = 10;
 
   const saveTimers = useRef({});
-  const API_URL = "http://localhost:8080/api/payments"; // ✅ Uses base from axiosInstance
+  const API_URL = "http://15.206.219.199:8080/api/payments"; // ✅ Uses base from axiosInstance
 
   useEffect(() => {
     fetchPayments();
