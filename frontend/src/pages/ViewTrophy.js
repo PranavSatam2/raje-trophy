@@ -49,6 +49,8 @@ function ViewTrophy() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentRows = filteredRows.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+  const userRole = localStorage.getItem("role");
+
 
   useEffect(() => {
     setCurrentPage(1);
@@ -82,6 +84,7 @@ function ViewTrophy() {
             <th>Date</th>
             <th>Sold Date</th>
             <th>Sold Price</th>
+            <th>Sale Price</th>
             <th>Image</th>
             <th>Action</th>
           </tr>
@@ -98,6 +101,7 @@ function ViewTrophy() {
               <td>{row.doe ? row.doe.split("T")[0] : ""}</td>
               <td>{row.soldDate ? row.soldDate.split("T")[0] : ""}</td>
               <td>₹{row.soldPrice}</td>
+              <td>₹{row.salePrice}</td>
               <td>
                 {row.image ? (
                   <img
@@ -114,11 +118,34 @@ function ViewTrophy() {
               <td>
                 <Link
                   to={`/admin/dashboard/edit/${row.trophyCode}/${row.size}`}
-                  className="btn btn-warning btn-sm"
+                  className="btn btn-warning btn-sm me-2"
                 >
                   Edit
                 </Link>
+
+                {/* Show delete button only if role = ADMIN */}
+                {userRole === "ADMIN" && (
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                      if (window.confirm(`Delete size ${row.size} for trophy ${row.trophyCode}?`)) {
+                        TrophyService.deleteTrophy(row.trophyCode, row.size)
+                          .then((res) => {
+                            alert(res.data || "Deleted Successfully");
+                            window.location.reload();
+                          })
+                          .catch((err) => {
+                            console.error("Delete failed", err);
+                            alert("Failed to delete");
+                          });
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                )}
               </td>
+
             </tr>
           ))}
           {currentRows.length === 0 && (

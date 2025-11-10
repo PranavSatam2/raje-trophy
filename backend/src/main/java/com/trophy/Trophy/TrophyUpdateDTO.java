@@ -17,6 +17,7 @@ public class TrophyUpdateDTO {
         private String colour;
         private Double soldPrice;
         private Date soldDate;
+        private String salePrice;
 
         // Getters & Setters
         public Double getSize() {
@@ -65,6 +66,13 @@ public class TrophyUpdateDTO {
 
         public void setSoldDate(Date soldDate) {
             this.soldDate = soldDate;
+        }
+
+        public String getSalePrice() {
+            return salePrice;
+        }
+        public void setSalePrice(String salePrice) {
+            this.salePrice = salePrice;
         }
     }
 

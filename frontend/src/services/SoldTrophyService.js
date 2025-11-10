@@ -1,24 +1,36 @@
-// src/services/SoldTrophyService.js
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api"; // change to your backend base URL
+const API_BASE_URL = "http://localhost:8080/api"; 
+
+// Get token from local storage
+const authHeader = {
+  Authorization: `Bearer ${localStorage.getItem("token")}`,
+};
 
 class SoldTrophyService {
-  // Sell trophy
+  
+  // ✅ Sell trophy (updates stock + stores sale record)
   sellTrophy(trophyCode, size, quantitySold, soldPrice, soldDate) {
-    return axios.post(`${API_BASE_URL}/trophies/${trophyCode}/sell`, null, {
-      params: {
-        size,
-        quantity: quantitySold,
-        soldPrice,
-        soldDate,
-      },
-    });
+    return axios.post(
+      `${API_BASE_URL}/trophies/${encodeURIComponent(trophyCode)}/sell`,
+      null,
+      {
+        params: {
+          size,
+          quantity: quantitySold,
+          soldPrice,
+          soldDate,
+        },
+        headers: authHeader,
+      }
+    );
   }
 
-  // Fetch sold trophies
+  // ✅ Get all sold trophy records
   getAllSoldTrophies() {
-    return axios.get(`${API_BASE_URL}/sold-trophies`);
+    return axios.get(`${API_BASE_URL}/sold-trophies`, {
+      headers: authHeader,
+    });
   }
 }
 

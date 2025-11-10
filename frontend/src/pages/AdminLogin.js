@@ -4,27 +4,21 @@ import LoginService from "../services/LoginService"; // Adjust path if needed
 import "./AdminLogin.css";
 
 function AdminLogin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await LoginService.login({
-        username: email,
-        password: password,
-      });
+      const res = await LoginService.login(username, password);
 
-      if (response.data === "Login successful!") {
-        navigate("/admin/dashboard");
-      } else {
-        alert("Invalid credentials");
-      }
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("role", res.role);
+
+      navigate("/admin/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
-      alert("An error occurred while logging in.");
+      alert("Invalid Username or Password");
     }
   };
 
@@ -37,12 +31,12 @@ function AdminLogin() {
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
               id="email"
               placeholder="admin@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
