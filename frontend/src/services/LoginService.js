@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://15.206.219.199:8080/auth/login";
+const API_URL = "https://rajesports07.in/auth/login";
 
 const login = async (username, password) => {
   const response = await axios.post(API_URL, { username, password });

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://15.206.219.199:8080/"
+  baseURL: "https://rajesports07.in/"
 });
 
 api.interceptors.request.use((config) => {
