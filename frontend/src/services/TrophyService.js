@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // const BASE_URL = "http://localhost:8080/api/trophies";
-const BASE_URL = "http://15.206.219.199:8080/api/trophies";
+const BASE_URL = "https://rajesports07.in/api/trophies";
 
 
 const TrophyService = {

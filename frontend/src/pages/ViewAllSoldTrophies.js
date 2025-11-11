@@ -10,7 +10,7 @@ const ViewAllSoldTrophies = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  const API_URL = "http://15.206.219.199:8080/sold-trophies";
+  const API_URL = "https://rajesports07.in/sold-trophies";
 
   // Fetch all sold trophies
   // Fetch all sold trophies
