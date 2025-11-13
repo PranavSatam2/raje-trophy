@@ -10,7 +10,7 @@ const ViewAllSoldTrophies = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  const API_URL = "https://rajesports07.in/sold-trophies";
+  const API_URL = "https://rajesports07.in/api/sold-trophies";
 
   // Fetch all sold trophies
   // Fetch all sold trophies
@@ -59,7 +59,7 @@ useEffect(() => {
 
   axios
     .post(
-      "http://localhost:8080/api/trophies/export-sold-trophies",
+      "https://rajesports07.in/api/trophies/export-sold-trophies",
       {},
       {
         responseType: "blob",

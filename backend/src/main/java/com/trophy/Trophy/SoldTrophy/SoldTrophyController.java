@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/sold-trophies")
+@RequestMapping("/api/sold-trophies")
 @CrossOrigin(origins = "http://localhost:3000")
 //@PreAuthorize("hasRole('ADMIN')")
 public class SoldTrophyController {
