@@ -244,7 +244,7 @@ function Trophy() {
               </div>
 
               <div className="col-md-3 mb-2">
-                <label>Sale Price (₹)</label>
+                <label>Sale Price Per Unit(₹)</label>
                 <input
                   type="number"
                   name="salePrice"
