@@ -19,7 +19,7 @@ function ViewImages() {
 
     const load = async () => {
         try {
-            const res = await ImageService.getAllImages();
+            const res = await ImageService.getAllImagesAdmin();
             setImages(res.data);
         } catch (err) {
             console.error("Failed:", err);
