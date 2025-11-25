@@ -10,7 +10,8 @@ const ViewAllSoldTrophies = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(10);
 
-  const API_URL = "https://rajesports07.in/api/sold-trophies";
+  // const API_URL = "https://rajesports07.in/api/sold-trophies";
+  const API_URL = "http://localhost:8080/api/sold-trophies";
 
   // Fetch all sold trophies
   // Fetch all sold trophies

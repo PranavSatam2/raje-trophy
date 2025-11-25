@@ -1,69 +1,112 @@
-import React from "react";
-import Slider from "react-slick";
+import React, { useEffect, useRef, useState } from "react";
+import ImageService from "../services/ImageService";
 import "./Home.css";
 
-function Home() {
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 2000,
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1
+export default function Home() {
+  const [images, setImages] = useState([]);
+  const sliderRef = useRef(null);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const res = await ImageService.getAllImagesPublic(); // must await
+        const data = res.data || []; // protect against undefined
+        setImages(data);
+      } catch (err) {
+        console.error("Error fetching images:", err);
+        setImages([]);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (sliderRef.current) {
+        const scrollWidth = sliderRef.current.clientWidth; // visible width
+        sliderRef.current.scrollBy({
+          left: scrollWidth / 3, // scroll by 1 image width
+          behavior: "smooth",
+        });
+
+        // Loop back to start
+        if (
+          sliderRef.current.scrollLeft + scrollWidth >=
+          sliderRef.current.scrollWidth
+        ) {
+          sliderRef.current.scrollTo({ left: 0, behavior: "smooth" });
         }
       }
-    ]
-  };
+    }, 3000); // scroll every 3 seconds
 
-  const productImages = [
-    { src: "/images/trophy1.jpg", title: "🏅 Sports Trophy" },
-    { src: "/images/trophy2.jpg", title: "🎖️ Academic Medal" },
-    { src: "/images/trophy3.jpg", title: "🏆 Custom Award" },
-    { src: "/images/trophy4.jpg", title: "🥇 Glass Trophy" }
-  ];
+    return () => clearInterval(interval);
+  }, [images]);
+
 
   return (
-    <div className="home-page">
+    <div className="homepage">
 
-      {/* ✅ Welcome Section */}
-      <section className="welcome-section" id="welcome">
-        <h1>Welcome to TrophyZone 🏆</h1>
-        <p>We specialize in high-quality trophies and awards for all occasions.</p>
-        <a href="#products" className="explore-btn">Explore Products</a>
+      {/* HERO SECTION */}
+      <section className="hero">
+        <div className="hero-content">
+          <h1>Premium Trophies & Awards</h1>
+          <p>Crafted for sports, academics, corporate excellence & celebrations.</p>
+          <a href="/product-gallery" className="hero-btn">Explore Products</a>
+        </div>
       </section>
 
-      {/* ✅ Products Section */}
-      <section id="products" className="products-section">
-        <h2>Our Products</h2>
-        <Slider {...settings}>
-          {productImages.map((item, index) => (
-            <div key={index} className="product-slide">
-              <img src={item.src} alt={item.title} />
-              <p>{item.title}</p>
-            </div>
-          ))}
-        </Slider>
+      {/* PRODUCT SLIDER */}
+      <section className="products-section">
+        <h2 className="section-title">Our Products</h2>
+
+        <div className="product-slider" ref={sliderRef}>
+          {images.length === 0 ? (
+            <p style={{ textAlign: "center", color: "#666" }}>
+              Loading products...
+            </p>
+          ) : (
+            images.map((img) => (
+              <div key={img.id} className="product-card">
+                <img
+                  src={ImageService.getImageUrl(img.id)}
+                  alt={img.fileName || "Product Image"}
+                />
+              </div>
+            ))
+          )}
+        </div>
       </section>
 
-      {/* ✅ Contact Section */}
-      <section id="contact" className="contact-section">
-        <h2>Contact Us</h2>
-        <form className="contact-form">
-          <input type="text" placeholder="Your Name" required />
-          <input type="email" placeholder="Your Email" required />
-          <textarea rows="4" placeholder="Your Message" required></textarea>
-          <button type="submit">Send Inquiry</button>
-        </form>
+
+      {/* CONTACT FORM */}
+      <section className="contact-section">
+        <h2 className="section-title">Contact Us</h2>
+
+        <div className="contact-card">
+          <input type="text" placeholder="Your Name" />
+          <input type="email" placeholder="Your Email" />
+          <textarea placeholder="Your Message"></textarea>
+          <button className="send-btn">Send Inquiry</button>
+        </div>
       </section>
-      
+
+      {/* LOCATIONS */}
+      <section className="locations-section">
+        <h2 className="section-title">Our Locations</h2>
+
+        <div className="location-box">
+          <h3>Mumbai</h3>
+          <p>123 Trophy Street, Andheri West, Mumbai, Maharashtra</p>
+        </div>
+
+        <div className="location-box">
+          <h3>Pune</h3>
+          <p>45 Champions Road, Shivaji Nagar, Pune, Maharashtra</p>
+        </div>
+      </section>
+
     </div>
   );
 }
-
-export default Home;

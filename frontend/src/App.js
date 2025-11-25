@@ -17,6 +17,9 @@ import EditDamageTrophy from "./pages/EditDamageTrophy";
 import ViewSoldTrophies from "./pages/ViewSoldTrophies";
 import ViewAllSoldTrophies from "./pages/ViewAllSoldTrophies";
 import PaymentSheet from './pages/PaymentSheet';  
+import AddImages from "./pages/Image/AddImages";
+import ViewImages from "./pages/Image/ViewImages";
+import ProductGallery from "./pages/ProductGallery";
 function App() {
   return (
     <Router>
@@ -27,6 +30,8 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<AdminLogin />} />
+
+        <Route path="/product-gallery" element={<ProductGallery />} />
 
         {/* Nested dashboard layout */}
         <Route path="/admin/dashboard" element={<AdminDashboard />}>
@@ -41,6 +46,8 @@ function App() {
           <Route path="view-sold-trophies" element={<ViewSoldTrophies />} />
           <Route path="view-all-sold-trophies" element={<ViewAllSoldTrophies />} />
           <Route path="add-payment" element={<PaymentSheet />} />
+          <Route path="images-add" element={<AddImages />} />
+          <Route path="images-view" element={<ViewImages />} />
         </Route>
       </Routes>
 

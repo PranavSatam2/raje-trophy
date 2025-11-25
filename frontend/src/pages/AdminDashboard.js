@@ -1,11 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
 
 function AdminDashboard() {
+
+  const [role, setRole] = useState(localStorage.getItem("role"));
+
+  useEffect(() => {
+    // When login/logout updates localStorage, update state
+    const updateRole = () => setRole(localStorage.getItem("role"));
+
+    window.addEventListener("storage", updateRole);
+
+    return () => {
+      window.removeEventListener("storage", updateRole);
+    };
+  }, []);
+
+  useEffect(() => {
+    // When user logs in/out in same tab, manually update
+    const interval = setInterval(() => {
+      const newRole = localStorage.getItem("role");
+      if (newRole !== role) {
+        setRole(newRole);
+      }
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, [role]);
+
   return (
     <div className="d-flex">
       {/* Sidebar */}
-      <div className="bg-dark text-white p-3" style={{ width: "250px", height: "100vh" }}>
+      <div className="bg-dark text-white p-3" style={{ width: "250px", height: "120vh" }}>
         <h5 className="mb-4">🏆 Admin Panel</h5>
         <ul className="nav flex-column">
           <li className="nav-item">
@@ -32,6 +58,21 @@ function AdminDashboard() {
           {/* <li className="nav-item">
             <Link to="view-payments" className="nav-link text-white">View Payment Info</Link>
           </li> */}
+          {role === "ADMIN" && (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="images-add">
+                  Add Images
+                </Link>
+              </li>
+
+              <li className="nav-item">
+                <Link className="nav-link" to="images-view">
+                  View Images
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
 
