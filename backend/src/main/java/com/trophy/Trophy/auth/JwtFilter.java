@@ -51,4 +51,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+
+        // allow public endpoints without JWT
+        return path.startsWith("/api/images")
+                || path.startsWith("/public");
+    }
+
 }

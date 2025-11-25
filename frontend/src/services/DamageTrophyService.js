@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL_DAMAGE = "https://rajesports07.in/api/damage-trophies";
+// const BASE_URL_DAMAGE = "http://localhost:8080/api/damage-trophies";
 
 // Retrieve token from localStorage
 const authHeader = {

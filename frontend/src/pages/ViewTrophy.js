@@ -6,7 +6,7 @@ function ViewTrophy() {
   const [trophies, setTrophies] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5);
+  const [itemsPerPage] = useState(10);
   const [selectedImage, setSelectedImage] = useState(null); // For modal
 
   useEffect(() => {
