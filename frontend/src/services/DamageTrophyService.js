@@ -38,10 +38,9 @@ const DamageTrophyService = {
       }
     ),
 
-  deleteByTrophyCodeAndSize: (trophyCode, size) =>
-    axios.delete(`${BASE_URL_DAMAGE}/delete/code/${encodeURIComponent(trophyCode)}/size/${size}`, {
-      headers: authHeader,
-    }),
+  deleteByTrophyCodeAndSize(trophyCode, size) {
+    return axios.delete(`${BASE_URL_DAMAGE}/${trophyCode}/size/${size}`);
+}
 };
 
 export default DamageTrophyService;
